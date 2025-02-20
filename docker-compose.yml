@@ -1,0 +1,15 @@
+services:
+  nextjs:
+    container_name: nextjs-app
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules  # Eviter d'écraser les node_modules du conteneur
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    command: ["sh", "-c", "npm install && npm run dev"]
+    depends_on: []  # Tu peux ajouter d'autres services ici plus tard
+    restart: unless-stopped
