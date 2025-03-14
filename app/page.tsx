@@ -40,7 +40,7 @@ export default function Home() {
         ) : usersData ? (
           <div>
             <h2>Données depuis l&apos;API</h2>
-            <pre>{JSON.stringify(usersData, null, 2)}</pre>
+            <pre>{usersData.map((userData) => userData.name)}</pre>
           </div>
         ) : (
           <p>Impossible de récupérer les données</p>
