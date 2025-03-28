@@ -3,16 +3,23 @@
 import { useState, useEffect } from 'react';
 import Image from "next/image";
 
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+};
+
 export default function Home() {
   // Définir les états pour stocker les données et l'état de chargement
-  const [usersData, setUsersData] = useState(null);
+  const [usersData, setUsersData] = useState<User[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Utiliser useEffect pour appeler l'API au chargement du composant
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('/api/users');
+        const res = await fetch('/api/users/');
         
         if (res.ok) {
           const data = await res.json();
@@ -40,7 +47,7 @@ export default function Home() {
         ) : usersData ? (
           <div>
             <h2>Données depuis l&apos;API</h2>
-            <pre>{usersData.map((userData) => userData.name)}</pre>
+            <pre>{usersData.map((userData: User) => userData.id)}</pre>
           </div>
         ) : (
           <p>Impossible de récupérer les données</p>
