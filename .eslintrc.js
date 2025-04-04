@@ -1,5 +1,6 @@
 module.exports = {
   root: true,
+  parser: '@typescript-eslint/parser',
   extends: [
     'next', 
     'next/core-web-vitals', 
@@ -12,6 +13,10 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2021,
     sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true
+    },
+    project: './tsconfig.json'
   },
   env: {
     browser: true,
@@ -31,6 +36,12 @@ module.exports = {
     }],
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     "quotes": ["error", "single", { "avoidEscape": true }],
+    // Règles supplémentaires recommandées
+    'react/jsx-uses-react': 'off',
+    'react/jsx-uses-vars': 'error',
+    'import/prefer-default-export': 'off',
+    '@next/next/no-img-element': 'off',
+    'jsx-a11y/alt-text': 'warn'
   },
   settings: {
     react: {

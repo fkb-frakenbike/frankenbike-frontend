@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
 import { useState, useEffect } from 'react';
-import Image from "next/image";
+import Image from 'next/image';
 
 type User = {
   id: number;
@@ -20,7 +20,7 @@ export default function Home() {
     async function fetchData() {
       try {
         const res = await fetch('/api/users/');
-        
+
         if (res.ok) {
           const data = await res.json();
           setUsersData(data);
@@ -28,7 +28,7 @@ export default function Home() {
           console.error('Échec de la récupération des données');
         }
       } catch (error) {
-        console.error("Erreur:", error);
+        console.error('Erreur:', error);
       } finally {
         setLoading(false);
       }
@@ -41,7 +41,7 @@ export default function Home() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <h1>Bonjour les amis !</h1>
-
+        <p>J’aime le pâté</p>
         {loading ? (
           <p>Chargement en cours...</p>
         ) : usersData ? (
@@ -60,13 +60,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
+          <Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
           Learn
         </a>
         {/* Les autres liens dans le footer... */}
