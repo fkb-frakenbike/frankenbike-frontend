@@ -75,10 +75,8 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           </div>
           
           <div className="text-sm text-center text-gray-600">
-            Vous n &apos avez pas de compte ? Inscrivez vous
-            <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500 ml-1">
-              Se connecter
-            </a>
+            Vous n&apos;avez pas de compte ?
+            <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500 ml-1">Inscrivez vous</a>
           </div>
         </Form>
       </div>
