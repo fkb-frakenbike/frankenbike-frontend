@@ -1,6 +1,6 @@
 "use client"
 
-import LoginFormComponent from "../Component/LoginFormComponent"
+import LoginFormComponent from "../components/LoginFormComponent"
 
 export default function Home() {
   return (
