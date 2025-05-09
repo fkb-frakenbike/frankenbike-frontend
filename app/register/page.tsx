@@ -1,6 +1,6 @@
 "use client"
 
-import FormComponent from '../Component/FormComponent'
+import FormComponent from '../components/FormComponent'
 
 export default function Home() {
   return(
