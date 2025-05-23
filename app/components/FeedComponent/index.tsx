@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import api from '../../lib/axios';
 
 interface User {
-  firstname: string;
+  id: number;
+  email: string;
   // Ajoute d'autres propriétés si besoin
 }
 
@@ -11,11 +12,11 @@ export default function FeedComponent() {
 
   useEffect(() => {
     api
-      .get('/users')
+      .get('/me')
       .then(res => setUser(res.data))
       .catch(() => setUser(null));
   }, []);
 
   if (user === null) return <div>Non connecté</div>;
-  return <div>Bienvenue, {user.firstname} !</div>;
+  return <div>Bienvenue, {user.id} !</div>;
 }
