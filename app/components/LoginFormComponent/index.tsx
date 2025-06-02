@@ -1,61 +1,41 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// app/components/LoginFormComponent.tsx
-// (or wherever you keep your React components)
-// ─────────────────────────────────────────────────────────────────────────────
-
+// File: app/components/LoginFormComponent.tsx
 'use client';
 
 import React, { useState } from 'react';
 
-// Define exactly the shape of the JSON that /api/me returns:
 type ApiUser = {
   id: number;
   email: string;
-  password: string;             // (usually you wouldn’t expose this in production)
-  plainPassword: string | null; // (should always be null once hashed)
-  role: string;                 // e.g. "admin" or "user"
+  password: string;             // (you would not expose this in production)
+  plainPassword: string | null; // (null once hashed)
+  role: string;                 // e.g. "user" or "admin"
   createdAt: string;            // ISO‐8601 date string
-  projects: unknown[];          // we don’t care about the project details right now
+  projects: unknown[];
   likes: unknown[];
-  userIdentifier: string;       // same as “email” typically
-  roles: string[];              // e.g. ["ROLE_ADMIN"]
+  userIdentifier: string;
+  roles: string[];
 };
-
 interface LoginFormState {
   email: string;
   password: string;
 }
 
 export default function LoginFormComponent() {
-  // ── 1. Form state: email + password
-  const [formData, setFormData] = useState<LoginFormState>({
-    email: '',
-    password: '',
-  });
-
-  // ── 2. “user” will hold the object returned by GET /api/me, or null if not yet fetched
+  const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '' });
   const [user, setUser] = useState<ApiUser | null>(null);
-
-  // ── 3. “error” holds any error‐message string, if login or /api/me fails
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // ── 4. “loading” is true while our fetch calls are in flight
-  const [loading, setLoading] = useState(false);
+  // Pull base URL from environment variable:
+  // (The “!” tells TypeScript “trust me, this will be defined at runtime.”)
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE!;
+  // ↳ If you forgot to set NEXT_PUBLIC_API_BASE, baseUrl === undefined
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  //  Handle every keystroke in the form inputs
-  // ─────────────────────────────────────────────────────────────────────────────
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  //  When the user submits the form:
-  //   • POST to Symfony’s /api/login
-  //   • Browser will store the HTTP‐only cookie “AUTH_TOKEN_COOKIE=…”
-  //   • Then we immediately fetch /api/me with credentials: 'include'
-  // ─────────────────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -63,26 +43,32 @@ export default function LoginFormComponent() {
     setLoading(true);
 
     try {
-      // ── A) LOGIN STEP: POST /api/login with { email, password }
-      const loginRes = await fetch('http://localhost:8787/api/login', {
+      // ── A) LOGIN:
+      // Use the env var instead of hard-coding “http://localhost:8787”
+      const loginRes = await fetch(`${baseUrl}/api/login`, {
         method: 'POST',
-        credentials: 'include', // ⬅️ this tells the browser: “please store the Set-Cookie from Symfony”
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+        credentials: 'include', // ← Without this, Set-Cookie is dropped
       });
       if (!loginRes.ok) {
+        const errorJson = await loginRes.json();
+        console.log('/api/login returned →', loginRes.status, errorJson);
         throw new Error(`Login failed (status ${loginRes.status})`);
       }
 
-      // ── B) FETCH /api/me using the cookie the server just set
-      const meRes = await fetch('http://localhost:8787/api/me', {
+      // ── B) FETCH /api/me:
+      const meRes = await fetch(`${baseUrl}/api/me`, {
         method: 'GET',
-        credentials: 'include', // ⬅️ ensures the JWT cookie is sent back to Symfony
+        credentials: 'include',
       });
+      console.log("baseUrl =", baseUrl)
       if (!meRes.ok) {
         throw new Error(`/api/me failed (status ${meRes.status})`);
       }
-
       const meJson: ApiUser = await meRes.json();
       setUser(meJson);
     } catch (err: unknown) {
@@ -96,23 +82,17 @@ export default function LoginFormComponent() {
     }
   };
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  //  The rendered JSX:
-  //  • Plain <form onSubmit={…}> so JavaScript can intercept it.
-  //  • We do NOT use next/form here, because next/form → Next router tries to find a Next “page” at /search.
-  //  • Instead, we do everything by hand via fetch().
-  // ─────────────────────────────────────────────────────────────────────────────
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#2D005E] via-[#2D005E] to-[rgba(49,0,102,0.7)]"
-      style={{ backgroundSize: '100% 100%', backgroundPosition: '0 0, 0 26%, 0 67%, 0 98%' }}
-    >
+    <div className="flex min-h-screen items-center justify-center
+                    bg-gradient-to-b from-[#2D005E] via-[#2D005E] to-[rgba(49,0,102,0.7)]">
       <div className="mx-auto my-10 max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-semibold text-gray-800">Sign In</h1>
+        <h1 className="mb-6 text-center text-2xl font-semibold text-gray-800">
+          Sign In
+        </h1>
 
-        {/* ── CHANGE: use a normal <form> so we can handle onSubmit ourselves ── */}
+        {/* 6) Plain <form> so we intercept onSubmit */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ── Email Input ── */}
+          {/* Email */}
           <div className="space-y-2">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
@@ -120,15 +100,16 @@ export default function LoginFormComponent() {
             <input
               type="email"
               id="email"
-              name="email" // must match LoginFormState.email
+              name="email"               // must match LoginFormState.email
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2
+                         focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             />
           </div>
 
-          {/* ── Password Input ── */}
+          {/* Password */}
           <div className="space-y-2">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
@@ -136,27 +117,30 @@ export default function LoginFormComponent() {
             <input
               type="password"
               id="password"
-              name="password" // must match LoginFormState.password
+              name="password"            // must match LoginFormState.password
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2
+                         focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             />
           </div>
 
-          {/* ── Submit Button ── */}
+          {/* Submit Button */}
           <div>
             <button
               type="submit"
-              disabled={loading} // disable while our fetch is in flight
-              className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              disabled={loading}
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2
+                         text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none
+                         focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
           </div>
         </form>
 
-        {/* ── If the user object is now filled, display its JSON ── */}
+        {/* If we have a user from /api/me, show it */}
         {user && (
           <div className="mt-6 p-4 border rounded bg-gray-50">
             <h2 className="font-semibold mb-2">Authenticated User</h2>
@@ -164,7 +148,7 @@ export default function LoginFormComponent() {
           </div>
         )}
 
-        {/* ── If an error occurred, show it ── */}
+        {/* If there was an error, show it */}
         {error && (
           <div className="mt-4 text-red-600">
             <strong>Error:</strong> {error}
@@ -174,4 +158,3 @@ export default function LoginFormComponent() {
     </div>
   );
 }
-
