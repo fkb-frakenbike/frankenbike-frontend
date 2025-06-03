@@ -3,18 +3,7 @@
 
 import React, { useState } from 'react';
 
-type ApiUser = {
-  id: number;
-  email: string;
-  password: string;             // (you would not expose this in production)
-  plainPassword: string | null; // (null once hashed)
-  role: string;                 // e.g. "user" or "admin"
-  createdAt: string;            // ISO‐8601 date string
-  projects: unknown[];
-  likes: unknown[];
-  userIdentifier: string;
-  roles: string[];
-};
+
 interface LoginFormState {
   email: string;
   password: string;
@@ -22,14 +11,12 @@ interface LoginFormState {
 
 export default function LoginFormComponent() {
   const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '' });
-  const [user, setUser] = useState<ApiUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   // Pull base URL from environment variable:
   // (The “!” tells TypeScript “trust me, this will be defined at runtime.”)
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE!;
-  // ↳ If you forgot to set NEXT_PUBLIC_API_BASE, baseUrl === undefined
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,12 +26,10 @@ export default function LoginFormComponent() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    setUser(null);
     setLoading(true);
 
     try {
-      // ── A) LOGIN:
-      // Use the env var instead of hard-coding “http://localhost:8787”
+      // ── A) LOGIN : Use the env var instead of hard-coding “http://localhost:8787”
       const loginRes = await fetch(`${baseUrl}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,22 +40,17 @@ export default function LoginFormComponent() {
         credentials: 'include', // ← Without this, Set-Cookie is dropped
       });
       if (!loginRes.ok) {
-        const errorJson = await loginRes.json();
-        console.log('/api/login returned →', loginRes.status, errorJson);
-        throw new Error(`Login failed (status ${loginRes.status})`);
+        let msg = `Login failed (status ${loginRes.status})`;
+        try {
+          const errJson = await loginRes.json();
+          if (errJson.error) {
+            msg = errJson.error;
+          }
+        } catch (_) {}
+        throw new Error(msg);
       }
 
-      // ── B) FETCH /api/me:
-      const meRes = await fetch(`${baseUrl}/api/me`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-      console.log("baseUrl =", baseUrl)
-      if (!meRes.ok) {
-        throw new Error(`/api/me failed (status ${meRes.status})`);
-      }
-      const meJson: ApiUser = await meRes.json();
-      setUser(meJson);
+      window.location.href = '/feed'
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -140,13 +120,7 @@ export default function LoginFormComponent() {
           </div>
         </form>
 
-        {/* If we have a user from /api/me, show it */}
-        {user && (
-          <div className="mt-6 p-4 border rounded bg-gray-50">
-            <h2 className="font-semibold mb-2">Authenticated User</h2>
-            <pre className="text-sm">{JSON.stringify(user, null, 2)}</pre>
-          </div>
-        )}
+
 
         {/* If there was an error, show it */}
         {error && (
