@@ -5,10 +5,10 @@ import React, { useEffect, useState } from 'react';
 type ApiUser = {
   id: number;
   email: string;
-  password: string;             // (you would never expose this in production)
+  password: string; // (you would never expose this in production)
   plainPassword: string | null; // (null once hashed)
-  role: string;                 // e.g. "user" or "admin"
-  createdAt: string;            // ISO‐8601 date string
+  role: string; // e.g. "user" or "admin"
+  createdAt: string; // ISO‐8601 date string
   projects: unknown[];
   likes: unknown[];
   userIdentifier: string;
@@ -36,8 +36,12 @@ export default function FeedComponent() {
 
         const meJson: ApiUser = await meRes.json();
         setUser(meJson);
-      } catch (err: any) {
-        setError(err.message || 'Unknown error fetching /api/me');
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError(String(err));
+        }
       } finally {
         setLoading(false);
       }
@@ -45,11 +49,7 @@ export default function FeedComponent() {
   }, [baseUrl]);
 
   if (loading) {
-    return (
-      <div className="p-8 text-center text-gray-600">
-        Loading feed…
-      </div>
-    );
+    return <div className="p-8 text-center text-gray-600">Loading feed…</div>;
   }
 
   if (error) {
@@ -63,9 +63,7 @@ export default function FeedComponent() {
   // If we have a valid user, show them (or render any feed UI you like)
   return (
     <div className="p-8">
-      <h2 className="mb-4 text-2xl font-semibold text-gray-800">
-        Feed (Authenticated)
-      </h2>
+      <h2 className="mb-4 text-2xl font-semibold text-gray-800">Feed (Authenticated)</h2>
       <div className="rounded-md border bg-gray-50 p-4">
         <h3 className="mb-2 text-lg font-medium">Your User Object</h3>
         <pre className="whitespace-pre-wrap bg-white p-4 text-sm text-gray-700">

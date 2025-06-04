@@ -1,9 +1,13 @@
-"use client"
+'use client';
 
-import FormComponent from '../components/FormComponent'
+import FormComponent from '../components/FormComponent';
+import LoginCheck from '../services/loginCheck';
 
 export default function Home() {
-  return(
-    <FormComponent />
-  )
+  return (
+    <>
+      <LoginCheck />
+      <FormComponent />
+    </>
+  );
 }

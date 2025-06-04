@@ -3,7 +3,6 @@
 
 import React, { useState } from 'react';
 
-
 interface LoginFormState {
   email: string;
   password: string;
@@ -46,11 +45,11 @@ export default function LoginFormComponent() {
           if (errJson.error) {
             msg = errJson.error;
           }
-        } catch (_) {}
+        } catch {}
         throw new Error(msg);
       }
 
-      window.location.href = '/feed'
+      window.location.href = '/feed';
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -63,12 +62,9 @@ export default function LoginFormComponent() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center
-                    bg-gradient-to-b from-[#2D005E] via-[#2D005E] to-[rgba(49,0,102,0.7)]">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#2D005E] via-[#2D005E] to-[rgba(49,0,102,0.7)]">
       <div className="mx-auto my-10 max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-semibold text-gray-800">
-          Sign In
-        </h1>
+        <h1 className="mb-6 text-center text-2xl font-semibold text-gray-800">Sign In</h1>
 
         {/* 6) Plain <form> so we intercept onSubmit */}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -80,12 +76,11 @@ export default function LoginFormComponent() {
             <input
               type="email"
               id="email"
-              name="email"               // must match LoginFormState.email
+              name="email" // must match LoginFormState.email
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full rounded-md border border-gray-300 px-3 py-2
-                         focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             />
           </div>
 
@@ -97,12 +92,11 @@ export default function LoginFormComponent() {
             <input
               type="password"
               id="password"
-              name="password"            // must match LoginFormState.password
+              name="password" // must match LoginFormState.password
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full rounded-md border border-gray-300 px-3 py-2
-                         focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             />
           </div>
 
@@ -111,16 +105,12 @@ export default function LoginFormComponent() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2
-                         text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none
-                         focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
           </div>
         </form>
-
-
 
         {/* If there was an error, show it */}
         {error && (
