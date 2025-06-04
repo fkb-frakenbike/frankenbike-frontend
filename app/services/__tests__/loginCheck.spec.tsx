@@ -14,8 +14,8 @@ describe('LoginCheck', () => {
     global.fetch = jest.fn();
   });
 
-  it('redirige vers /feed si /api/me retourne 200', async () => {
-    // Mock fetch pour retourner un status 200
+  it('redirects to /feed if /api/me returns 200', async () => {
+    // Mock fetch to return status 200
     (fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
 
     const push = jest.fn();
@@ -23,12 +23,12 @@ describe('LoginCheck', () => {
 
     render(<LoginCheck />);
 
-    // Attends que le push soit appelé
+    // Wait for push to be called
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(push).toHaveBeenCalledWith('/feed');
   });
 
-  it('ne redirige pas si /api/me retourne une erreur', async () => {
+  it('does not redirect if /api/me returns an error', async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({ ok: false });
 
     const push = jest.fn();
