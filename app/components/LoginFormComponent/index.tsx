@@ -2,20 +2,22 @@
 'use client';
 
 import React, { useState } from 'react';
+import api from '../../lib/axios'; // ← importe ton instance Axios
+import axios, { AxiosError } from 'axios';
 
 interface LoginFormState {
   email: string;
   password: string;
 }
 
+interface LoginErrorResponse {
+  error: string;
+}
+
 export default function LoginFormComponent() {
   const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  // Pull base URL from environment variable:
-  // (The “!” tells TypeScript “trust me, this will be defined at runtime.”)
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE!;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,33 +30,19 @@ export default function LoginFormComponent() {
     setLoading(true);
 
     try {
-      // ── A) LOGIN : Use the env var instead of hard-coding “http://localhost:8787”
-      const loginRes = await fetch(`${baseUrl}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-        credentials: 'include', // ← Without this, Set-Cookie is dropped
+      await api.post('/api/login', {
+        email: formData.email,
+        password: formData.password,
       });
-      if (!loginRes.ok) {
-        let msg = `Login failed (status ${loginRes.status})`;
-        try {
-          const errJson = await loginRes.json();
-          if (errJson.error) {
-            msg = errJson.error;
-          }
-        } catch {}
-        throw new Error(msg);
-      }
-
       window.location.href = '/feed';
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (axios.isAxiosError(err)) {
+        const apiError = err as AxiosError<LoginErrorResponse>;
+        setError(apiError.response?.data?.error || apiError.message || 'Erreur inconnue');
+      } else if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError(String(err));
+        setError('Login failed (erreur inconnue)');
       }
     } finally {
       setLoading(false);
