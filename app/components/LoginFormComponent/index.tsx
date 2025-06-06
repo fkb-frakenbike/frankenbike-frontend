@@ -8,6 +8,7 @@ import axios, { AxiosError } from 'axios';
 interface LoginFormState {
   email: string;
   password: string;
+  rememberMe:boolean;
 }
 
 interface LoginErrorResponse {
@@ -15,13 +16,14 @@ interface LoginErrorResponse {
 }
 
 export default function LoginFormComponent() {
-  const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '' });
+  const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '',rememberMe: false });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, type, value, checked } = e.target;
+    setFormData(prev => ({ ...prev,
+      [name]: type=== 'checkbox'? checked : value, }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,7 +35,10 @@ export default function LoginFormComponent() {
       await api.post('/api/login', {
         email: formData.email,
         password: formData.password,
-      });
+        rememberMe: formData.rememberMe,
+      },
+        { withCredentials: true }
+      );
       window.location.href = '/feed';
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
@@ -86,6 +91,21 @@ export default function LoginFormComponent() {
               required
               className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             />
+          </div>
+
+          {/* Remember Me Checkbox */}
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              name="rememberMe" // must match LoginFormState.rememberMe
+              checked={formData.rememberMe}
+              onChange={handleChange}
+              className="h-4 w-4 accent-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+            />
+            <label htmlFor="rememberMe" className="text-sm text-gray-700">
+              Remember Me
+            </label>
           </div>
 
           {/* Submit Button */}
