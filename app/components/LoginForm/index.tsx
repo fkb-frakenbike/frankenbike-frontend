@@ -17,7 +17,7 @@ interface LoginErrorResponse {
 }
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '' });
+  const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '', rememberMe:false });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
