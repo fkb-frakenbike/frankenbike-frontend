@@ -49,6 +49,7 @@ export default function RegisterForm() {
       await api.post('/api/users', {
         email: formData.email,
         password: formData.password,
+        firstname: formData.firstname,
       });
       window.location.href = '/feed';
     } catch (err: unknown) {
@@ -67,7 +68,7 @@ export default function RegisterForm() {
 
   return (
     <div
-      className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#2D005E] via-[#2D005E] to-[rgba(49,0,102,0.7)]"
+      className="fkb-bg flex min-h-screen items-center justify-center"
       style={{ backgroundSize: '100% 100%', backgroundPosition: '0 0, 0 26%, 0 67%, 0 98%' }}
     >
       <div className="mx-auto my-10 max-w-md rounded-lg bg-transparent p-8">
@@ -124,12 +125,17 @@ export default function RegisterForm() {
           </div>
 
           <div className="text-center text-sm text-white">
-            Vous avez déjà un compte?
+            Vous avez déjà un compte ?
             <a href="/login" className="ml-1 font-medium text-white hover:text-indigo-500">
               Se connecter
             </a>
           </div>
         </form>
+        {error && (
+          <div className="mt-4 text-red-600">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
       </div>
     </div>
   );
