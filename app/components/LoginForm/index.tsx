@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import api from '../../lib/axios'; // ← importe ton instance Axios
 import axios, { AxiosError } from 'axios';
+import InputField from '../InputField/InputField';
 
 interface LoginFormState {
   email: string;
@@ -15,8 +16,8 @@ interface LoginErrorResponse {
   error: string;
 }
 
-export default function LoginFormComponent() {
-  const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '',rememberMe: false });
+export default function LoginForm() {
+  const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -56,42 +57,31 @@ export default function LoginFormComponent() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#2D005E] via-[#2D005E] to-[rgba(49,0,102,0.7)]">
-      <div className="mx-auto my-10 max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-semibold text-gray-800">Sign In</h1>
+      <div className="mx-auto my-10 max-w-md rounded-lg bg-transparent p-8">
+        <h1 className="font-other mb-6 text-center text-4xl font-semibold text-white">Sign in</h1>
 
         {/* 6) Plain <form> so we intercept onSubmit */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email */}
-          <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email" // must match LoginFormState.email
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-            />
-          </div>
-
-          {/* Password */}
-          <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password" // must match LoginFormState.password
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-            />
-          </div>
+          <InputField
+            label="Email"
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+          />
+          <InputField
+            label="Password"
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+          />
 
           {/* Remember Me Checkbox */}
           <div className="flex items-center space-x-2">
@@ -113,10 +103,16 @@ export default function LoginFormComponent() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="flex w-full justify-center rounded-full border border-white bg-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
-              {loading ? 'Signing in…' : 'Sign In'}
+              {loading ? 'Signing in…' : 'Sign in'}
             </button>
+          </div>
+          <div className="text-center text-sm text-white">
+            Pas de compte ?
+            <a href="/register" className="ml-1 font-medium text-white hover:text-indigo-500">
+              Enregistrez-vous
+            </a>
           </div>
         </form>
 

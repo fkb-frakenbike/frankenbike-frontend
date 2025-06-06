@@ -1,13 +1,13 @@
 'use client';
 
-import LoginFormComponent from '../components/LoginFormComponent';
+import LoginForm from '../components/LoginForm';
 import LoginCheck from '../services/loginCheck';
 
 export default function Home() {
   return (
     <>
       <LoginCheck />
-      <LoginFormComponent />
+      <LoginForm />
     </>
   );
 }

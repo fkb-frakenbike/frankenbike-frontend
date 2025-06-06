@@ -15,7 +15,7 @@ type ApiUser = {
   roles: string[];
 };
 
-export default function FeedComponent() {
+export default function Feed() {
   const [user, setUser] = useState<ApiUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
