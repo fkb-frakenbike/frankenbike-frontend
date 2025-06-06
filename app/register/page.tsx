@@ -1,13 +1,13 @@
 'use client';
 
-import RegisterFormComponent from '../components/RegisterFormComponent';
+import RegisterForm from '../components/RegisterForm';
 // import LoginCheck from '../services/loginCheck';
 
 export default function Home() {
   return (
     <>
       {/* <LoginCheck /> */}
-      <RegisterFormComponent />
+      <RegisterForm />
     </>
   );
 }
