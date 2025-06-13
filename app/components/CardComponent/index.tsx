@@ -83,6 +83,7 @@ export default function CardSlider() {
               key={idx}
               className={`flex-shrink-0 w-64 h-full ${slide.color} rounded-xl shadow-xl flex flex-col overflow-hidden snap-center`}
             >
+            
               {/* Image */}
               <div className="relative w-full h-40">
                 <img

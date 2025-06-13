@@ -1,4 +1,4 @@
-import Feed from '../components/Feed';
+import Feed from '../components/FeedComponent';
 import CardComponent from '../components/CardComponent'
 export default function FeedPage() {
   return (
