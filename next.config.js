@@ -1,14 +1,12 @@
 /** @type {import('next').NextConfig} */
-
 const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://host.docker.internal:8787/:path*',
-      },
-    ]
+  webpack: (config, { dev }) => {
+    config.watchOptions = {
+      poll: 100,            // check for changes every 100ms
+      aggregateTimeout: 300 // wait 300ms after change before rebuilding
+    };
+    return config;
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

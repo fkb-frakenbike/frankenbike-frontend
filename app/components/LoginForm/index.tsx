@@ -70,7 +70,7 @@ export default function LoginForm() {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-green-900 text-center"
           />
           <InputField
             label="Password"

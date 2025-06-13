@@ -1,15 +1,27 @@
 services:
   nextjs:
     container_name: nextjs-app
-    image: node:18-alpine
+
+    # Build from our Dockerfile so `npm ci` runs at image build time
+    build:
+      context: .               # project root (where package.json lives)
+      dockerfile: docker/Dockerfile
+
     working_dir: /app
-    volumes:
-      - .:/app
-      - /app/node_modules  # Eviter d'écraser les node_modules du conteneur
     ports:
       - "3000:3000"
+    # Mount code for live edits; preserve node_modules + .next in-container
+    volumes:
+      - .:/app:delegated
+      - /app/node_modules
+      - /app/.next
     environment:
       - NODE_ENV=development
-    command: ["sh", "-c", "npm install && npm run dev"]
-    depends_on: []  # Tu peux ajouter d'autres services ici plus tard
+      - WATCHPACK_POLLING=true      # Webpack watcher polls for changes
+      - CHOKIDAR_USEPOLLING=true    # chokidar (Next/Tailwind) polls too
+      - CHOKIDAR_INTERVAL=100       # poll every 100ms
+      - TAILWIND_MODE=watch         # ensure Tailwind stays in JIT watch mode
+
+    # Simply run dev—no npm install here!
+    command: ["npm", "run", "dev"]
     restart: unless-stopped
