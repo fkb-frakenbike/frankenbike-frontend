@@ -51,7 +51,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#2D005E] via-[#2D005E] to-[rgba(49,0,102,0.7)]">
+    <div className="fkb-bg flex min-h-screen items-center justify-center">
       <div className="mx-auto my-10 max-w-md rounded-lg bg-transparent p-8">
         <h1 className="font-other mb-6 text-center text-4xl font-semibold text-white">Sign in</h1>
 
