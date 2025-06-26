@@ -44,11 +44,11 @@ export default function LoginForm() {
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const apiError = err as AxiosError<LoginErrorResponse>;
-        setError(apiError.response?.data?.error || apiError.message || 'Erreur inconnue');
+        setError(apiError.response?.data?.error || apiError.message || 'unknown error');
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('Login failed (erreur inconnue)');
+        setError('Login failed (unknown error)');
       }
     } finally {
       setLoading(false);

@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import api from '@/app/lib/axios';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 type ApiUser = {
   id: number;
@@ -16,111 +19,57 @@ type ApiUser = {
 };
 
 export default function Feed() {
+  const router = useRouter();
   const [user, setUser] = useState<ApiUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [loggingOut, setLoggingOut] = useState<boolean>(false);
-
-
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE!;
 
   useEffect(() => {
-    (async () => {
+    const fetchUser = async () => {
       try {
-        const meRes = await fetch(`${baseUrl}/api/me`, {
-          method: 'GET',
-          credentials: 'include', // ← send the JWT cookie
-        });
-
-        if (!meRes.ok) {
-          throw new Error(`/api/me failed (status ${meRes.status})`);
-        }
-
-        const meJson: ApiUser = await meRes.json();
-        setUser(meJson);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
+        const res = await api.get('/api/me');
+        setUser(res.data);
+      } catch (err) {
+        setUser(null);
+        if (axios.isAxiosError(err)) {
+          setError(
+            err.response?.status === 401
+              ? 'Not authenticated'
+              : err.message
+          );
+          router.push("/login");
+        } else if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError(String(err));
+          setError('Unknown error');
         }
       } finally {
         setLoading(false);
       }
-    })();
-  }, [baseUrl]);
+    };
+    void fetchUser();
+  }, []);
 
-  // 2) A function to call /api/logout and clear state
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    try {
-      const res = await fetch(`${baseUrl}/api/logout`, {
-        method: 'POST',
-        credentials: 'include', // ensure the cookie is sent so the server can clear it
-      });
-      if (!res.ok) {
-        throw new Error(`Logout failed (status ${res.status})`);
-      }
-      // Clear local state so we no longer think the user is logged in
-      setUser(null);
-      setError('You have been logged out.');
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(String(err));
-      }
-    } finally {
-      setLoggingOut(false);
-    }
-  };
-
-  if (loading) {
-    return <div className="p-8 text-center text-gray-600">Loading feed…</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="p-8 text-center text-red-600">
-        <strong>Error:</strong> {error}
-      </div>
-    );
-  }
-
-// If user is null but no error, it means maybe the token was missing/expired
-  if (!user) {
-    return (
-      <div className="p-8 text-center text-gray-700">
-        <p>You are not authenticated. Please log in.</p>
-        <button
-          onClick={() => (window.location.href = '/login')}
-          className="mt-4 rounded bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
-        >
-          Go to Login
-        </button>
-      </div>
-    );
-  }
-
-  // If we have a valid user, show them + a logout button
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Feed (Authenticated)</h2>
-        <button
-          onClick={handleLogout}
-          disabled={loggingOut}
-          className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:opacity-50"
-        >
-          {loggingOut ? 'Logging out…' : 'Logout'}
-        </button>
-      </div>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Feed</h2>
+      {/* Show user info for testing */}
+      {loading ? (
+        <div className="text-gray-500">Loading user…</div>
+      ) : error ? (
+        <div className="text-red-600 mb-4">{error}</div>
+      ) : user ? (
+        <div className="mb-4 p-3 bg-indigo-100 rounded text-indigo-900 shadow">
+          <strong>User:</strong> {user.email}
+        </div>
+      ) : (
+        <div className="text-gray-600 mb-4">No user info.</div>
+      )}
 
-      <div className="rounded-md border bg-gray-50 p-4">
-        <h3 className="mb-2 text-lg font-medium text-gray-800">Your User Object</h3>
-        <pre className="whitespace-pre-wrap bg-white p-4 text-sm text-gray-700">
-          {JSON.stringify(user, null, 2)}
-        </pre>
+      {/* ...rest of your feed logic/content... */}
+      <div>
+        {/* Example: */}
+        <p>Your feed posts go here…</p>
       </div>
     </div>
   );
