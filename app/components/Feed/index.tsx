@@ -66,10 +66,9 @@ export default function Feed() {
         <div className="text-gray-600 mb-4">No user info.</div>
       )}
 
-      {/* ...rest of your feed logic/content... */}
+      {/* ...rest of feed logic/content... */}
       <div>
-        {/* Example: */}
-        <p>Your feed posts go here…</p>
+        <p>Feed posts go here</p>
       </div>
     </div>
   );
