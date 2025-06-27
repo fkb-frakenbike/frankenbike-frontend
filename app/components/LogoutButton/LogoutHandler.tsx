@@ -1,10 +1,15 @@
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import axios from 'axios';
 import api from '../../lib/axios'; // ou le bon chemin selon ton arborescence
-import { useState } from 'react';
 
-const useLogout = (setUser: (user: null) => void, setError: (msg: string) => void) => {
+const useLogout = (
+  setUser: (user: null) => void,
+  setError: (msg: string) => void
+) => {
   const [loggingOut, setLoggingOut] = useState(false);
-
+  const router = useRouter();
+  
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
@@ -13,7 +18,7 @@ const useLogout = (setUser: (user: null) => void, setError: (msg: string) => voi
         throw new Error(`Logout failed (status ${res.status})`);
       }
       setUser(null);
-      setError('You have been logged out.');
+      router.push('/login');
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.error || err.message || 'Erreur inconnue');
