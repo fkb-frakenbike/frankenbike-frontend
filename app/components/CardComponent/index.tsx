@@ -14,7 +14,6 @@ type CardProps = {
   color?: string;
   userImg?: string;
   userName?: string;
-  date?: string;
   nature?: string;
 };
 
@@ -42,7 +41,6 @@ export default function CardComponent({
   color,
   userImg,
   userName,
-  date,
   nature,
 }: CardProps) {
   const [isLiked, setIsLiked] = useState(false);
@@ -86,7 +84,7 @@ export default function CardComponent({
         />
         <div>
           <div className="text-white font-semibold text-sm">{userName}</div>
-          <div className="text-white/70 text-xs">{date}</div>
+      
         </div>
       </div>
     )}
