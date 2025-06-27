@@ -22,14 +22,18 @@ const Header: React.FC = () => {
   }, []);
   return (
     <header className="fixed left-0 top-0 z-50 w-full bg-transparent py-8">
-      <h1 className="font-main text-center text-3xl text-white">FKB</h1>
-      {/* Only show the logout button if user is logged in */}
-
-      <div className="absolute right-4 top-4">
-        {user && (
-          <span className="text-white mr-2">{user.email}</span>
-        )}
-        {user && <LogoutButton setUser={setUser} setError={setError} />}
+      <div className="relative mx-auto flex max-w-5xl items-center justify-between px-6">
+        {/* Centered FKB logo */}
+        <div className="absolute left-1/2 top-0 transform -translate-x-1/2">
+          <h1 className="font-main text-3xl text-white">FKB</h1>
+        </div>
+        {/* Right-aligned user/email/logout */}
+        <div className="ml-auto flex items-center gap-4">
+          {user && (
+            <span className="text-white hidden sm:block">{user.email}</span>
+          )}
+          {user && <LogoutButton setUser={setUser} setError={setError} />}
+        </div>
       </div>
       {error && <div className="text-red-600">{error}</div>}
     </header>
