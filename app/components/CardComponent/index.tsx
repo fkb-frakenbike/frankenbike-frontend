@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Next.js 13+
 
 type CardVariant = "cardcolor" | "purpleCard";
 
@@ -46,6 +47,7 @@ export default function CardComponent({
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [randomColor, setRandomColor] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (variant === "cardcolor") {
@@ -63,101 +65,109 @@ export default function CardComponent({
   }
 
   return (
-  <div
-    className={`
-      w-64 h-80
-      sm:w-72 sm:h-96
-      md:w-80 md:h-[420px]
-      ${cardColor}
-      rounded-xl shadow-xl flex flex-col overflow-hidden
-      transition-all duration-300 hover:shadow-2xl hover:-translate-y-1
-      ${className}
-    `}
-  >
-    {/* Header pour cardcolor */}
-    {variant === "cardcolor" && (
-      <div className="flex items-center gap-3 px-3 pt-3 sm:px-4 md:px-6">
-        <img
-          src={userImg}
-          alt={userName}
-          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-white"
-        />
-        <div>
-          <div className="text-white font-semibold text-sm">{userName}</div>
-      
-        </div>
-      </div>
-    )}
-
-    {/* PURPLECARD: nature d'abord, puis image */}
-    {variant === "purpleCard" && nature && (
-      <div className="px-3 pt-3 sm:px-4 md:px-6">
-       <div className="mb-2 text-xs font-bold text-white uppercase tracking-wide text-center w-full">{nature}</div>
-      </div>
-    )}
-
     <div
-      className={`relative w-full 
-        ${variant === "cardcolor" ? "mt-4" : "mt-2"} 
-        ${variant === "cardcolor" ? "h-28 sm:h-36 md:h-40" : "h-32 sm:h-40 md:h-48"}
-        ${variant === "purpleCard" ? "px-3 sm:px-4 md:px-6" : ""}
+      className={`
+        w-64 h-80
+        sm:w-72 sm:h-96
+        md:w-80 md:h-[420px]
+        ${cardColor}
+        rounded-xl shadow-xl flex flex-col overflow-hidden
+        transition-all duration-300 hover:shadow-2xl hover:-translate-y-1
+        ${className}
       `}
     >
-      <img
-        src={img}
-        alt={title}
-        className="object-cover w-full h-full rounded-[30px]"
-      />
-    </div>
-
-    {/* Contenu */}
-    <div className="flex-1 flex flex-col justify-between px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6">
-      <div>
-        {/* Pour cardcolor : titre et bio */}
-        {variant === "cardcolor" && (
-          <>
-            <h5 className="mb-2 font-semibold text-white drop-shadow text-base sm:text-lg md:text-xl">{title}</h5>
-            <p className="font-light text-white/90 text-xs sm:text-sm md:text-base">{text}</p>
-          </>
-        )}
-        {/* Pour purpleCard : titre et bio en dessous de l'image */}
-        {variant === "purpleCard" && (
-          <>
-            <h5 className="mt-2 mb-2 font-semibold text-white drop-shadow text-base sm:text-lg md:text-xl">{title}</h5>
-            <p className="font-light text-white/90 text-xs sm:text-sm md:text-base">{text}</p>
-          </>
-        )}
-      </div>
-      {/* Icônes */}
-      <div className="flex items-center justify-between gap-1 sm:gap-2 mt-3 sm:mt-4">
-        <button
-          onClick={() => setIsLiked((v) => !v)}
-          className="flex items-center bg-white/90 hover:bg-white rounded-full transition-colors duration-200 px-2 py-1 sm:px-3 sm:py-1 min-w-[48px] sm:min-w-[70px] gap-1 sm:gap-2"
-        >
+      {/* Header pour cardcolor */}
+      {variant === "cardcolor" && (
+        <div className="flex items-center gap-3 px-3 pt-3 sm:px-4 md:px-6">
           <img
-            src={"/SvgSite/like.png"}
-            alt="Like"
-            className="w-4 h-4 sm:w-5 sm:h-5"
+            src={userImg}
+            alt={userName}
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-white"
           />
-          <span className="font-bold text-black text-xs sm:text-base">{likes + (isLiked ? 1 : 0)}</span>
-        </button>
-        <div className="flex items-center bg-white/90 rounded-full px-2 py-1 sm:px-3 sm:py-1 min-w-[48px] sm:min-w-[70px] gap-1 sm:gap-2">
-          <img src="/SvgSite/comment.png" alt="Commentaire" className="w-4 h-4 sm:w-5 sm:h-5" />
-          <span className="font-bold text-black text-xs sm:text-base">{comments}</span>
+          <div>
+            <div className="text-white font-semibold text-sm">{userName}</div>
+          </div>
         </div>
-        <button
-          onClick={() => setIsSaved((v) => !v)}
-          className="flex items-center bg-white/90 hover:bg-white rounded-full transition-colors duration-200 px-1 py-1 sm:px-2 sm:py-1 min-w-[28px] sm:min-w-[36px] gap-1"
-        >
-          <img
-            src={"/SvgSite/save.png"}
-            alt="Enregistrer"
-            className="w-4 h-4 sm:w-5 sm:h-5 mx-auto"
-          />
-        </button>
+      )}
+
+      {/* PURPLECARD: nature d'abord, puis image */}
+      {variant === "purpleCard" && nature && (
+        <div className="px-3 pt-3 sm:px-4 md:px-6">
+          <div className="mb-2 text-xs font-bold text-white uppercase tracking-wide text-center w-full">{nature}</div>
+        </div>
+      )}
+
+      <div
+        className={`relative w-full 
+          ${variant === "cardcolor" ? "mt-4" : "mt-2"} 
+          ${variant === "cardcolor" ? "h-28 sm:h-36 md:h-40" : "h-32 sm:h-40 md:h-48"}
+          ${variant === "purpleCard" ? "px-3 sm:px-4 md:px-6" : ""}
+        `}
+      >
+        <img
+          src={img}
+          alt={title}
+          className="object-cover w-full h-full rounded-[30px]"
+        />
+      </div>
+
+      {/* Contenu */}
+      <div className="flex-1 flex flex-col px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6">
+        <div>
+          {variant === "cardcolor" && (
+            <>
+              <h5 className="font-semibold text-white drop-shadow text-base sm:text-lg md:text-xl mb-1">{title}</h5>
+              <p className="font-light text-white/90 text-xs sm:text-sm md:text-base line-clamp-2">
+                {text}
+              </p>
+            </>
+          )}
+          {variant === "purpleCard" && (
+            <>
+              <h5 className="mt-2 mb-2 font-semibold text-white drop-shadow text-base sm:text-lg md:text-xl">{title}</h5>
+              <p className="font-light text-white/90 text-xs sm:text-sm md:text-base line-clamp-2">
+                {text}
+              </p>
+            </>
+          )}
+          {/* Bouton détails qui redirige vers /details */}
+          <button
+            className="text-xs text-white underline mt-1 self-end"
+            onClick={() => router.push('/details')}
+            type="button"
+          >
+            Détails
+          </button>
+        </div>
+        {/* Icônes TOUJOURS EN BAS */}
+        <div className="flex items-center justify-between gap-1 sm:gap-2 mt-auto pt-2">
+          <button
+            onClick={() => setIsLiked((v) => !v)}
+            className="flex items-center bg-white/90 hover:bg-white rounded-full transition-colors duration-200 px-2 py-1 sm:px-3 sm:py-1 min-w-[48px] sm:min-w-[70px] gap-1 sm:gap-2"
+          >
+            <img
+              src={"/SvgSite/like.png"}
+              alt="Like"
+              className="w-4 h-4 sm:w-5 sm:h-5"
+            />
+            <span className="font-bold text-black text-xs sm:text-base">{likes + (isLiked ? 1 : 0)}</span>
+          </button>
+          <div className="flex items-center bg-white/90 rounded-full px-2 py-1 sm:px-3 sm:py-1 min-w-[48px] sm:min-w-[70px] gap-1 sm:gap-2">
+            <img src="/SvgSite/comment.png" alt="Commentaire" className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="font-bold text-black text-xs sm:text-base">{comments}</span>
+          </div>
+          <button
+            onClick={() => setIsSaved((v) => !v)}
+            className="flex items-center bg-white/90 hover:bg-white rounded-full transition-colors duration-200 px-1 py-1 sm:px-2 sm:py-1 min-w-[28px] sm:min-w-[36px] gap-1"
+          >
+            <img
+              src={"/SvgSite/save.png"}
+              alt="Enregistrer"
+              className="w-4 h-4 sm:w-5 sm:h-5 mx-auto"
+            />
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }

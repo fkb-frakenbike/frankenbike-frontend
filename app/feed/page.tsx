@@ -18,6 +18,7 @@ type CardData = {
 
 const cardsData : CardData[] = [
   {
+    
     title: "Vélo tigre",
     text: "J'ai changé les roues de mon vélo tigre, dites moi ce que vous en pensez pls",
     img: "/bikeCustom.png",
@@ -26,10 +27,107 @@ const cardsData : CardData[] = [
     userImg: "/alice.jpg",
     userName: "Alice",
     date: "2025-06-27",
-    variant: "cardcolor", // <-- OK
+    variant: "purpleCard", // <-- OK
   },
   {
     title: "Titre 2",
+    text: "J'ai changé les roues de mon vélo tigre, dites moi ce que vous en pensez pls, J'ai changé les roues de mon vélo tigre, dites moi ce que vous en pensez pls",
+    img: "/bikeCustom.png",
+    likes: 5,
+    comments: 1,
+    userImg: "/alice.jpg",
+    userName: "Bob",
+    date: "2025-06-20",
+    variant: "cardcolor", // <-- OK
+    nature: "Selle",
+  },
+   {
+    title: "Titre 3",
+    text: "Description 2",
+    img: "/bikeCustom.png",
+    likes: 5,
+    comments: 1,
+    userImg: "/alice.jpg",
+    userName: "Bob",
+    date: "2025-06-20",
+    variant: "cardcolor", // <-- OK
+    nature: "Selle",
+  },
+
+ {
+    title: "Titre 4",
+    text: "Description 2",
+    img: "/bikeCustom.png",
+    likes: 5,
+    comments: 1,
+    userImg: "/alice.jpg",
+    userName: "Bob",
+    date: "2025-06-20",
+    variant: "cardcolor", // <-- OK
+    nature: "Selle",
+  },
+   {
+    title: "Titre 5",
+    text: "Description 2",
+    img: "/bikeCustom.png",
+    likes: 5,
+    comments: 1,
+    userImg: "/alice.jpg",
+    userName: "Bob",
+    date: "2025-06-20",
+    variant: "cardcolor", // <-- OK
+    nature: "Selle",
+  },
+   {
+    title: "Titre 6",
+    text: "Description 2",
+    img: "/bikeCustom.png",
+    likes: 5,
+    comments: 1,
+    userImg: "/alice.jpg",
+    userName: "Bob",
+    date: "2025-06-20",
+    variant: "cardcolor", // <-- OK
+    nature: "Selle",
+  },
+   {
+    title: "Titre 7",
+    text: "Description 2",
+    img: "/bikeCustom.png",
+    likes: 5,
+    comments: 1,
+    userImg: "/alice.jpg",
+    userName: "Bob",
+    date: "2025-06-20",
+    variant: "cardcolor", // <-- OK
+    nature: "Selle",
+  },
+   {
+    title: "Titre 8",
+    text: "Description 2",
+    img: "/bikeCustom.png",
+    likes: 5,
+    comments: 1,
+    userImg: "/alice.jpg",
+    userName: "Bob",
+    date: "2025-06-20",
+    variant: "cardcolor", // <-- OK
+    nature: "Selle",
+  },
+   {
+    title: "Titre 9",
+    text: "Description 2",
+    img: "/bikeCustom.png",
+    likes: 5,
+    comments: 1,
+    userImg: "/alice.jpg",
+    userName: "Bob",
+    date: "2025-06-20",
+    variant: "cardcolor", // <-- OK
+    nature: "Selle",
+  },
+   {
+    title: "Titre 10",
     text: "Description 2",
     img: "/bikeCustom.png",
     likes: 5,
