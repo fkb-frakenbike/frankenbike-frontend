@@ -1,13 +1,13 @@
 'use client';
 
-import CardDetailsPage from "../detailsForm";
+import CardDetailsPage from "../components/detailsForm";
 
 export default function Home() {
   return (
     <>
       <CardDetailsPage 
       img="/bikeCustom.png"
-      title="Titre de la carte"
+      title="Mon tt nouveau tiger bike"
       text="Voici la biographie ou la description longue du post. Tu peux mettre autant de texte que tu veux ici, 
       il s'affichera dans l'encadré à droite."/>
     </>

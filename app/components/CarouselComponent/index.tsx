@@ -1,4 +1,3 @@
-// CarouselComponent.jsx
 'use client'
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -27,7 +26,14 @@ function useCardsToShow() {
 
   useEffect(() => {
     function handleResize() {
-      setCardsToShow(window.innerWidth >= 1024 ? 3 : 1);
+      const width = window.innerWidth;
+      if (width >= 1280) {
+        setCardsToShow(3); // xl et plus
+      } else if (width >= 1024) {
+        setCardsToShow(2); // lg
+      } else {
+        setCardsToShow(1); // mobile & tablette
+      }
     }
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -37,21 +43,25 @@ function useCardsToShow() {
   return cardsToShow;
 }
 
+
+
 export default function Carousel({ data }: CarouselProps) {
   const [active, setActive] = useState(0);
   const cardsToShow = useCardsToShow();
 
   // Calcul des indices des cartes à afficher
-  const getVisibleIndices = () => {
-    const n = cardsToShow;
-    const half = Math.floor(n / 2);
-    const indices = [];
-    for (let i = -half; i <= half; i++) {
-      let idx = (active + i + data.length) % data.length;
-      indices.push(idx);
-    }
-    return n === 1 ? [active] : indices;
-  };
+ const getVisibleIndices = () => {
+  const n = cardsToShow;
+  const indices = [];
+
+  for (let i = 0; i < n; i++) {
+    const idx = (active + i) % data.length;
+    indices.push(idx);
+  }
+
+  return indices;
+};
+
 
   const handlePrev = () => setActive((prev) => (prev - 1 + data.length) % data.length);
   const handleNext = () => setActive((prev) => (prev + 1) % data.length);
@@ -59,40 +69,22 @@ export default function Carousel({ data }: CarouselProps) {
   const visibleIndices = getVisibleIndices();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-8 space-y-8">
-      {/* Contrôles de navigation */}
-      <div className="flex items-center space-x-6">
-        {/* Bouton précédent */}
-        <button
-          onClick={handlePrev}
-          className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-          aria-label="Carte précédente"
-          type="button"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        {/* 4 cercles de navigation */}
-       
-
-        {/* Bouton suivant */}
-        <button
-          onClick={handleNext}
-          className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-          aria-label="Carte suivante"
-          type="button"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
+    <div className="relative w-full flex items-center justify-center min-h-[480px] py-8">
+      {/* Flèche gauche */}
+      <button
+        onClick={handlePrev}
+        className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 z-20"
+        aria-label="Carte précédente"
+        type="button"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
 
       {/* Cartes avec swipe */}
       <motion.div
-        className="flex justify-center items-center gap-x-2 lg:gap-x-4 px-8 cursor-grab active:cursor-grabbing"
+        className="flex justify-center items-center gap-x-2 lg:gap-x-4 px-12 cursor-grab active:cursor-grabbing w-full"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         onDragEnd={(event, info) => {
@@ -139,8 +131,20 @@ export default function Carousel({ data }: CarouselProps) {
         })}
       </motion.div>
 
+      {/* Flèche droite */}
+      <button
+        onClick={handleNext}
+        className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 z-20"
+        aria-label="Carte suivante"
+        type="button"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+
       {/* Informations sur l'utilisation */}
-      <div className="text-center text-gray-500 text-sm">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-center text-gray-500 text-sm pointer-events-none">
         <p className="lg:hidden">👈 Swipe pour naviguer 👉</p>
         <p className="hidden lg:block">Cliquez sur les boutons ou glissez pour naviguer</p>
       </div>
