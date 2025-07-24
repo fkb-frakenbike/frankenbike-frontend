@@ -1,5 +1,3 @@
-
-
 type Comment = {
   id: number;
   name: string;
@@ -18,7 +16,7 @@ const comments: Comment[] = [
     likes: 56,
     date: "Aujourd’hui à 16:30",
   },
-  // Tu peux en ajouter d’autres
+  // Ajoute d'autres si besoin
 ];
 
 export default function CommentBox() {
@@ -30,11 +28,14 @@ export default function CommentBox() {
           key={comment.id}
           className="flex items-start gap-3 bg-white bg-opacity-10 rounded-lg p-3 mb-3"
         >
+          {/* Avatar */}
           <img
             src={comment.avatarUrl}
             alt={comment.name}
             className="w-10 h-10 rounded-full object-cover"
           />
+
+          {/* Contenu */}
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <span className="font-bold text-white">{comment.name}</span>
@@ -42,16 +43,14 @@ export default function CommentBox() {
             </div>
             <div className="text-white mt-1">{comment.text}</div>
           </div>
+
+          {/* Like */}
           <div className="flex flex-col items-center ml-2 mt-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 text-white mb-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
+            <img
+              src={"/SvgSite/like.png"}
+              alt="Like"
+              className="w-4 h-4 sm:w-5 sm:h-5 mb-1"
+            />
             <span className="text-xs text-white">{comment.likes}</span>
           </div>
         </div>
