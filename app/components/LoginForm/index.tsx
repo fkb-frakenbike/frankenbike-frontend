@@ -5,26 +5,31 @@ import React, { useState } from 'react';
 import api from '../../lib/axios'; // ← importe ton instance Axios
 import axios, { AxiosError } from 'axios';
 import InputField from '../InputField/InputField';
+import { useRouter } from 'next/navigation';
 
 interface LoginFormState {
   email: string;
   password: string;
-  rememberMe:boolean;
+  rememberMe: boolean;
 }
 
 interface LoginErrorResponse {
   error: string;
 }
 
-export default function LoginForm() {
-  const [formData, setFormData] = useState<LoginFormState>({ email: '', password: '', rememberMe:false });
+const LoginForm = () => {
+  const [formData, setFormData] = useState<LoginFormState>({
+    email: '',
+    password: '',
+    rememberMe: false,
+  });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, type, value, checked } = e.target;
-    setFormData(prev => ({ ...prev,
-      [name]: type=== 'checkbox'? checked : value, }));
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,14 +38,16 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      await api.post('/api/login', {
-        email: formData.email,
-        password: formData.password,
-        rememberMe: formData.rememberMe,
-      },
+      await api.post(
+        '/api/login',
+        {
+          email: formData.email,
+          password: formData.password,
+          rememberMe: formData.rememberMe,
+        },
         { withCredentials: true }
       );
-      window.location.href = '/feed';
+      router.push('/feed');
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const apiError = err as AxiosError<LoginErrorResponse>;
@@ -70,7 +77,7 @@ export default function LoginForm() {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-green-900 text-center"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
           />
           <InputField
             label="Password"
@@ -91,9 +98,9 @@ export default function LoginForm() {
               name="rememberMe" // must match LoginFormState.rememberMe
               checked={formData.rememberMe}
               onChange={handleChange}
-              className="h-4 w-4 accent-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+              className="h-4 w-4 rounded border-gray-300 accent-purple-600 focus:ring-purple-500"
             />
-            <label htmlFor="rememberMe" className="text-sm text-gray-700">
+            <label htmlFor="rememberMe" className="text-sm text-white">
               Remember Me
             </label>
           </div>
@@ -125,4 +132,6 @@ export default function LoginForm() {
       </div>
     </div>
   );
-}
+};
+
+export default LoginForm;
