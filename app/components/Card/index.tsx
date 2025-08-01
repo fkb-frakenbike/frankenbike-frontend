@@ -9,13 +9,14 @@ type CardProps = {
   title: string;
   text: string;
   img: string;
-  likes: number;
+  likes?: number;
   comments: number;
   className?: string;
   color?: string;
   userImg?: string;
   userName?: string;
   nature?: string;
+  date?: string;
 };
 
 const RANDOM_COLORS = [
@@ -31,19 +32,19 @@ function getRandomColor() {
   return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
 }
 
-export default function CardComponent({
+const CardComponent = ({
   variant,
   title,
   text,
   img,
-  likes,
+  likes = 0,
   comments,
   className = '',
   color,
   userImg,
   userName,
   nature,
-}: CardProps) {
+}: CardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSaved, setIsSaved] = useState(false);
@@ -159,4 +160,6 @@ export default function CardComponent({
       </div>
     </div>
   );
-}
+};
+
+export default CardComponent;
