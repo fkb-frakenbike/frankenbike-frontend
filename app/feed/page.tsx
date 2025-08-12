@@ -139,6 +139,7 @@ const cardsData : CardData[] = [
     nature: "Selle",
   },
 ];
+import Test from '../components/Feed';
 
 export default function FeedPage() {
   return (
@@ -148,6 +149,7 @@ export default function FeedPage() {
 
           <Carousel data={cardsData} />
         
+        <Test />
       </div>
     </div>
   );

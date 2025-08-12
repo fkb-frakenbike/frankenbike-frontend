@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import api from '@/app/lib/axios';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 type ApiUser = {
   id: number;
@@ -16,59 +19,56 @@ type ApiUser = {
 };
 
 export default function Feed() {
+  const router = useRouter();
   const [user, setUser] = useState<ApiUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE!;
 
   useEffect(() => {
-    (async () => {
+    const fetchUser = async () => {
       try {
-        const meRes = await fetch(`${baseUrl}/api/me`, {
-          method: 'GET',
-          credentials: 'include', // ← send the JWT cookie
-        });
-
-        if (!meRes.ok) {
-          throw new Error(`/api/me failed (status ${meRes.status})`);
-        }
-
-        const meJson: ApiUser = await meRes.json();
-        setUser(meJson);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
+        const res = await api.get('/api/me');
+        setUser(res.data);
+      } catch (err) {
+        setUser(null);
+        if (axios.isAxiosError(err)) {
+          setError(
+            err.response?.status === 401
+              ? 'Not authenticated'
+              : err.message
+          );
+          router.push("/login");
+        } else if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError(String(err));
+          setError('Unknown error');
         }
       } finally {
         setLoading(false);
       }
-    })();
-  }, [baseUrl]);
+    };
+    void fetchUser();
+  }, []);
 
-  if (loading) {
-    return <div className="p-8 text-center text-gray-600">Loading feed…</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="p-8 text-center text-red-600">
-        <strong>Error:</strong> {error}
-      </div>
-    );
-  }
-
-  // If we have a valid user, show them (or render any feed UI you like)
   return (
     <div className="p-8">
-      <h2 className="mb-4 text-2xl font-semibold text-gray-800">Feed (Authenticated)</h2>
-      <div className="rounded-md border bg-gray-50 p-4">
-        <h3 className="mb-2 text-lg font-medium">Your User Object</h3>
-        <pre className="whitespace-pre-wrap bg-white p-4 text-sm text-gray-700">
-          {JSON.stringify(user, null, 2)}
-        </pre>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Feed</h2>
+      {/* Show user info for testing */}
+      {loading ? (
+        <div className="text-gray-500">Loading user…</div>
+      ) : error ? (
+        <div className="text-red-600 mb-4">{error}</div>
+      ) : user ? (
+        <div className="mb-4 p-3 bg-indigo-100 rounded text-indigo-900 shadow">
+          <strong>User:</strong> {user.email}
+        </div>
+      ) : (
+        <div className="text-gray-600 mb-4">No user info.</div>
+      )}
+
+      {/* ...rest of feed logic/content... */}
+      <div>
+        <p>Feed posts go here</p>
       </div>
     </div>
   );
