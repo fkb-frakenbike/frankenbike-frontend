@@ -16,6 +16,7 @@ type CardData = {
   userName: string;
   nature: string;
   variant: CardVariant;
+  projectName?: string; // <-- Ajoute si tu stockes le nom du projet dans la timeline
 };
 interface LoginErrorResponse {
   error: string;
@@ -26,19 +27,27 @@ export default function TimelinePage() {
   const [cards, setCards] = useState<CardData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Remplace "123" par la vraie logique pour récupérer l'id du user voulu
-  const userId = 123;
+  const [user, setUser] = useState<{id:number, name:string, img?:string} | null>(null);
+  const [projectName, setProjectName] = useState<string>("");
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
       try {
-        // Vérifie si l'utilisateur est connecté
-        await api.get('/api/me');
+        // Récupère les infos de l'utilisateur connecté
+        const me = await api.get('/api/me');
+        setUser(me.data); // {id, name, img}
+        const userId = me.data.id;
 
-        // Si connecté, charge la timeline
+        // Récupère la timeline
         const response = await api.get(`/api/timelines/${userId}`);
         setCards(response.data);
+
+        // Récupère le nom du projet depuis la timeline (si présent)
+        if (response.data.length && response.data[0].projectName) {
+        setProjectName(response.data.projectName);  // <== ici index 
+        } else {
+          setProjectName("Projet sans nom");
+        }
       } catch (err: unknown) {
         // Si erreur d'authentification, redirige vers login
         if (axios.isAxiosError(err) && err.response?.status === 401) {
@@ -59,7 +68,7 @@ export default function TimelinePage() {
     };
 
     checkAuthAndFetch();
-  }, [userId, router]);
+  }, [router]);
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p className="text-red-300 text-center">{error}</p>;
@@ -72,12 +81,13 @@ export default function TimelinePage() {
         Timeline
       </h1>
       <div className="flex justify-center items-center gap-6 mb-0">
-        <span className="text-xl font-bold text-white">Tiger Bike</span>
-        {/* Ici tu pourrais utiliser des infos renvoyées par l’API */}
+        {/* Nom du projet dynamique */}
+        <span className="text-xl font-bold text-white">{projectName}</span>
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-white">Alice</span>
+          {/* Nom et photo dynamiques du user */}
+          <span className="text-xl font-bold text-white">{user?.id || "Utilisateur"}</span>
           <img
-            src="/alice.jpg"
+            src={user?.img || "/default.jpg"}
             alt="Profil"
             className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full object-cover border-2 border-white"
           />
