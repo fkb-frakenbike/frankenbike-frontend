@@ -44,10 +44,11 @@ export default function TimelinePage() {
 
         // Récupère le nom du projet depuis la timeline (si présent)
         if (response.data.length && response.data[0].projectName) {
-        setProjectName(response.data.projectName);  // <== ici index 
+          setProjectName(response.data.projectName); // <== ici l'index  est crucial
         } else {
           setProjectName("Projet sans nom");
         }
+
       } catch (err: unknown) {
         // Si erreur d'authentification, redirige vers login
         if (axios.isAxiosError(err) && err.response?.status === 401) {
