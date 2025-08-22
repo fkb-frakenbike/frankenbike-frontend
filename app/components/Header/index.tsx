@@ -55,7 +55,7 @@ const Header: React.FC = () => {
 
   return (
     <nav
-      className={`${isVisible ? 'translate-y-0' : '-translate-y-full'} fixed z-50 w-full bg-transparent py-8 transition-transform duration-300 ease-in-out`}
+      className={`${isVisible ? 'translate-y-0' : '-translate-y-full'} bg-fkb-bg fixed z-50 w-full py-8 transition-transform duration-300 ease-in-out`}
     >
       <div className="relative mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className={`flex h-16 justify-between ${!isMobileMenuOpen && 'w-full'}`}>

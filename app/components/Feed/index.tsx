@@ -1,23 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import FeedList from './FeedList';
-import api from '../../lib/axios'; // Adjust the import path as necessary
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-
-// type ApiUser = {
-//   id: number;
-//   email: string;
-//   password: string; // (you would never expose this in production)
-//   plainPassword: string | null; // (null once hashed)
-//   role: string; // e.g. "user" or "admin"
-//   createdAt: string; // ISO‐8601 date string
-//   projects: unknown[];
-//   likes: unknown[];
-//   userIdentifier: string;
-//   roles: string[];
-// };
+import api from '../../lib/axios';
 
 type Project = {
   id: number;
@@ -31,191 +16,74 @@ type Project = {
   components: unknown[];
 };
 
-// const projects: CardData[] = [
-//   {
-//     title: 'Vélo tigre',
-//     text: "J'ai changé les roues de mon vélo tigre, dites moi ce que vous en pensez pls",
-//     img: '/bikeCustom.png',
-//     likes: 12,
-//     comments: 3,
-//     userImg: '/alice.jpg',
-//     userName: 'Alice',
-//     date: '2025-06-27',
-//     variant: 'purpleCard', // <-- OK
-//   },
-//   {
-//     title: 'Titre 2',
-//     text: "J'ai changé les roues de mon vélo tigre, dites moi ce que vous en pensez pls, J'ai changé les roues de mon vélo tigre, dites moi ce que vous en pensez pls",
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-//   {
-//     title: 'Titre 3',
-//     text: 'Description 2',
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-
-//   {
-//     title: 'Titre 4',
-//     text: 'Description 2',
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-//   {
-//     title: 'Titre 5',
-//     text: 'Description 2',
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-//   {
-//     title: 'Titre 6',
-//     text: 'Description 2',
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-//   {
-//     title: 'Titre 7',
-//     text: 'Description 2',
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-//   {
-//     title: 'Titre 8',
-//     text: 'Description 2',
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-//   {
-//     title: 'Titre 9',
-//     text: 'Description 2',
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-//   {
-//     title: 'Titre 10',
-//     text: 'Description 2',
-//     img: '/bikeCustom.png',
-//     likes: 5,
-//     comments: 1,
-//     userImg: '/alice.jpg',
-//     userName: 'Bob',
-//     date: '2025-06-20',
-//     variant: 'cardcolor', // <-- OK
-//     nature: 'Selle',
-//   },
-// ];
+const PAGE_SIZE = 10;
 
 const Feed = () => {
-  const router = useRouter();
-  const [projects, setProjects] = useState<Project[] | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await api.get('/api/projects');
-        setProjects(res.data);
-      } catch (err) {
-        setProjects(null);
-        console.error('Error fetching projects:', err);
-        if (axios.isAxiosError(err)) {
-          setError(err.response?.status === 401 ? 'Not authenticated' : err.message);
-          router.push('/login');
-        } else if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('Unknown error');
-        }
-      } finally {
-        setLoading(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState<number | null>(null);
+
+  const hasMore = total === null || projects.length < total;
+
+  const fetchProjects = useCallback(async (pageNum = 1) => {
+    try {
+      if (pageNum === 1) setLoading(true);
+      else setLoadingMore(true);
+      const res = await api.get('/api/projects', {
+        params: { page: pageNum, limit: PAGE_SIZE },
+      });
+      const { data, total: totalCount } = res.data;
+      if (pageNum === 1) setProjects(data);
+      else setProjects(prev => [...prev, ...data]);
+      setTotal(totalCount);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Erreur de chargement');
       }
-    };
-    void fetchProjects();
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
   }, []);
 
-  // const router = useRouter();
+  // Premier chargement
+  useEffect(() => {
+    fetchProjects(1);
+  }, [fetchProjects]);
 
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     try {
-  //       const res = await api.get('/api/projects');
-  //       setProjects(res.data);
-  //     } catch (err) {
-  //       setProjects(null);
-  //       if (axios.isAxiosError(err)) {
-  //         setError(err.response?.status === 401 ? 'Not authenticated' : err.message);
-  //         router.push('/login');
-  //       } else if (err instanceof Error) {
-  //         setError(err.message);
-  //       } else {
-  //         setError('Unknown error');
-  //       }
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   void fetchProjects();
-  // }, []);
+  // Scroll infini anticipé
+  useEffect(() => {
+    if (!hasMore || loadingMore) return;
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+        setPage(prev => prev + 1);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadingMore]);
+
+  // Charger la page suivante
+  useEffect(() => {
+    if (page > 1) fetchProjects(page);
+  }, [page, fetchProjects]);
 
   return (
-    <div className="min-h-screen rounded bg-indigo-100 p-3 text-indigo-900 shadow">
+    <div className="min-h-screen">
       <h2 className="mb-4 text-2xl font-semibold text-gray-800">Feed</h2>
       {loading ? (
         <div className="text-gray-500">Loading…</div>
       ) : error ? (
         <div className="mb-4 text-red-600">{error}</div>
       ) : (
-        projects && <FeedList projects={projects} />
+        <FeedList projects={projects} />
       )}
+      {loadingMore && <div className="py-4 text-center text-gray-500">Chargement…</div>}
     </div>
   );
 };
