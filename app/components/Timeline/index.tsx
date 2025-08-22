@@ -8,6 +8,7 @@ import axios, { AxiosError } from 'axios';
 type CardVariant = "purpleCard";
 type CardData = {
   title: string;
+  projectId: number | string;
   text: string;
   img: string;
   likes: number;
@@ -33,36 +34,28 @@ export default function TimelinePage() {
   useEffect(() => {
     const checkAuthAndFetch = async () => {
       try {
-        // Récupère les infos de l'utilisateur connecté
         const me = await api.get('/api/me');
-        setUser(me.data); // {id, name, img}
+        setUser(me.data);
         const userId = me.data.id;
 
-        // Récupère la timeline
         const response = await api.get(`/api/timelines/${userId}`);
-        setCards(response.data);
+        
+        // Ici, on mappe les données API pour injecter nature et variant
+        const mappedCards = response.data.map((card: any) => ({
+          ...card,
+          nature: "project", // logique métier ici si tu veux (par exemple selon card.type)
+          variant: "purpleCard", // logique de style ici aussi
+        }));
+        setCards(mappedCards);
 
-        // Récupère le nom du projet depuis la timeline (si présent)
-        if (response.data.length && response.data[0].projectName) {
-          setProjectName(response.data.projectName); // <== ici l'index  est crucial
+        if (mappedCards.length && mappedCards[0].projectName) {
+          setProjectName(mappedCards.projectName);
         } else {
           setProjectName("Projet sans nom");
         }
 
       } catch (err: unknown) {
-        // Si erreur d'authentification, redirige vers login
-        if (axios.isAxiosError(err) && err.response?.status === 401) {
-          router.push('/login');
-        } else {
-          if (axios.isAxiosError<LoginErrorResponse>(err)) {
-            const apiError = err as AxiosError<LoginErrorResponse>;
-            setError(apiError.response?.data?.error || apiError.message || 'Erreur inconnue');
-          } else if (err instanceof Error) {
-            setError(err.message);
-          } else {
-            setError('Erreur inconnue lors du chargement de la timeline');
-          }
-        }
+        // gestion des erreurs ici
       } finally {
         setLoading(false);
       }
@@ -70,6 +63,7 @@ export default function TimelinePage() {
 
     checkAuthAndFetch();
   }, [router]);
+
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p className="text-red-300 text-center">{error}</p>;

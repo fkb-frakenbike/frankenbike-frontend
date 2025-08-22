@@ -2,12 +2,14 @@
 import Image from "next/image";
 import CommentBox from "../CommentComponent"; 
 
-type DetailsProps = {
+export type DetailsProps = {
   img: string;
   title: string;
   text: string; // biographie ou description longue
   comment?: string;
 };
+
+
 
 export default function CardDetailsPage({ img, title, text, comment }: DetailsProps) {
   return (
@@ -64,7 +66,7 @@ export default function CardDetailsPage({ img, title, text, comment }: DetailsPr
 
           {/* Section CommentBox intégrée ici */}
           <div className="w-full max-w-xl">
-            <CommentBox />
+           
           </div>
         </div>
       </div>

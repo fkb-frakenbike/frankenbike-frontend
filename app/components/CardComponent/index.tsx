@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"; // Next.js 13+
 type CardVariant = "cardcolor" | "purpleCard";
 
 type CardProps = {
+  projectId: number | string;
   variant: CardVariant;
   title: string;
   text: string;
@@ -32,6 +33,7 @@ function getRandomColor() {
 }
 
 export default function CardComponent({
+  projectId,
   variant,
   title,
   text,
@@ -133,7 +135,11 @@ export default function CardComponent({
           {/* Bouton détails qui redirige vers /details */}
           <button
             className="text-xs text-white underline mt-1 self-end"
-            onClick={() => router.push('/details')}
+            
+           onClick={() => {
+          console.log('projectId envoyé:', projectId);
+          router.push(`/details/${projectId}`);
+        }}
             type="button"
           >
             Détails
