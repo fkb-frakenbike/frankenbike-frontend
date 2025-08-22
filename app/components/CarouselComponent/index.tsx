@@ -5,9 +5,9 @@ import CardComponent from "../CardComponent";
 
 // Types
 type CardData = {
-  title: string;
-  text: string;
-  img: string;
+  name: string;
+  description: string;
+  img?: string;
   likes: number;
   comments: number;
   userImg?: string;
