@@ -75,7 +75,7 @@ const Feed = () => {
 
   return (
     <div className="min-h-screen">
-      <h2 className="mb-4 text-2xl font-semibold text-gray-800">Feed</h2>
+      {/* <h2 className="mb-4 text-2xl font-semibold text-gray-800">Feed</h2> */}
       {loading ? (
         <div className="text-gray-500">Loading…</div>
       ) : error ? (
