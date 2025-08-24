@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Next.js 13+
+import { CardData, CardVariant } from  '../../types'
 
-type CardVariant = "cardcolor" | "purpleCard";
 
 type CardProps = {
   variant: CardVariant;

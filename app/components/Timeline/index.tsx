@@ -4,24 +4,7 @@ import { useRouter } from 'next/navigation';
 import Carousel from "../CarouselComponent";
 import api from '../../lib/axios'; 
 import axios, { AxiosError } from 'axios';
-
-type CardVariant = "purpleCard";
-
-type CardData = {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  origin: string;
-  img?: string;
-  likes?: number;
-  comments?: number;
-  userImg?: string;
-  userName?: string;
-  nature?: string;
-  variant: CardVariant;
-  projectName?: string;
-};
+import { CardData, CardVariant } from  '../../types'
 
 interface LoginErrorResponse {
   error: string;
@@ -96,10 +79,10 @@ export default function TimelinePage() {
       origin: component.origin,
       variant: "purpleCard",
       projectName: project.projectName,
-      img: component.img ?? "",
-      likes: component.likes ?? 0,
-      comments: component.comments ?? 0,
-      userImg: component.userImg ?? "",
+      img: component.img?.trim(),
+      likes: component.likes !== undefined ? component.likes : 0,
+      comments: component.comments !== undefined ? component.comments : 0,
+      userImg: component.userImg?.trim(),
       userName: component.userName ?? "",
       nature: component.nature ?? "",
     }));
