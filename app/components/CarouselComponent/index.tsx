@@ -36,6 +36,7 @@ function useCardsToShow() {
 
 
 export default function Carousel({ data }: CarouselProps) {
+   console.log("Carousel data:", data);
   const [active, setActive] = useState(0);
   const cardsToShow = useCardsToShow();
 
