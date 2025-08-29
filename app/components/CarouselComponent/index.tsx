@@ -2,21 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import CardComponent from "../CardComponent";
-
-// Types
-type CardData = {
-  projectId: number | string;
-  title: string;
-  text: string;
-  img: string;
-  likes: number;
-  comments: number;
-  userImg?: string;
-  userName?: string;
-  date?: string | Date;
-  nature?: string;
-  variant: "cardcolor" | "purpleCard";
-};
+import { CardData, CardVariant } from  '../../types'
 
 type CarouselProps = {
   data: CardData[];
