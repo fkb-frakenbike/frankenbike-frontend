@@ -16,7 +16,7 @@ type CardProps = {
   userImg?: string;
   userName?: string;
   nature?: string;
-  date?: string;
+  date?: string | Date;
 };
 
 const RANDOM_COLORS = [
