@@ -1,75 +1,91 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import api from '@/app/lib/axios';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState, useCallback } from 'react';
+import FeedList from './FeedList';
+import api from '../../lib/axios';
 
-type ApiUser = {
+type Project = {
   id: number;
-  email: string;
-  password: string; // (you would never expose this in production)
-  plainPassword: string | null; // (null once hashed)
-  role: string; // e.g. "user" or "admin"
-  createdAt: string; // ISO‐8601 date string
-  projects: unknown[];
-  likes: unknown[];
-  userIdentifier: string;
-  roles: string[];
+  user: { email: string };
+  title: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  imageUrl: string;
+  comments: unknown[];
+  components: unknown[];
 };
 
-export default function Feed() {
-  const router = useRouter();
-  const [user, setUser] = useState<ApiUser | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const PAGE_SIZE = 10;
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get('/api/me');
-        setUser(res.data);
-      } catch (err) {
-        setUser(null);
-        if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.status === 401
-              ? 'Not authenticated'
-              : err.message
-          );
-          router.push("/login");
-        } else if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('Unknown error');
-        }
-      } finally {
-        setLoading(false);
+const Feed = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState<number | null>(null);
+
+  const hasMore = total === null || (Array.isArray(projects) && projects.length < total);
+
+  const fetchProjects = useCallback(async (pageNum = 1) => {
+    try {
+      if (pageNum === 1) setLoading(true);
+      else setLoadingMore(true);
+      const res = await api.get('/api/projects', {
+        params: { page: pageNum, limit: PAGE_SIZE },
+      });
+      const { data, total: totalCount } = res.data;
+      if (pageNum === 1) setProjects(data);
+      else setProjects(prev => [...prev, ...data]);
+      setTotal(totalCount);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Erreur de chargement');
       }
-    };
-    void fetchUser();
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
   }, []);
 
-  return (
-    <div className="p-8">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Feed</h2>
-      {/* Show user info for testing */}
-      {loading ? (
-        <div className="text-gray-500">Loading user…</div>
-      ) : error ? (
-        <div className="text-red-600 mb-4">{error}</div>
-      ) : user ? (
-        <div className="mb-4 p-3 bg-indigo-100 rounded text-indigo-900 shadow">
-          <strong>User:</strong> {user.email}
-        </div>
-      ) : (
-        <div className="text-gray-600 mb-4">No user info.</div>
-      )}
+  // Premier chargement
+  useEffect(() => {
+    fetchProjects(1);
+  }, [fetchProjects]);
 
-      {/* ...rest of feed logic/content... */}
-      <div>
-        <p>Feed posts go here</p>
-      </div>
+  // Scroll infini anticipé
+  useEffect(() => {
+    if (!hasMore || loadingMore) return;
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+        setPage(prev => prev + 1);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadingMore]);
+
+  // Charger la page suivante
+  useEffect(() => {
+    if (page > 1) fetchProjects(page);
+  }, [page, fetchProjects]);
+
+  return (
+    <div className="min-h-screen">
+      {/* <h2 className="mb-4 text-2xl font-semibold text-gray-800">Feed</h2> */}
+      {loading ? (
+        <div className="text-gray-500">Loading…</div>
+      ) : error ? (
+        <div className="mb-4 text-red-600">{error}</div>
+      ) : (
+        <FeedList projects={projects} />
+      )}
+      {loadingMore && <div className="py-4 text-center text-gray-500">Chargement…</div>}
     </div>
   );
-}
+};
+
+export default Feed;
