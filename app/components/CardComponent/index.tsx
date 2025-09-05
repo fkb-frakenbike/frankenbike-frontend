@@ -1,15 +1,15 @@
 'use client'
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Next.js 13+
+import { CardData, CardVariant } from  '../../types'
 
-type CardVariant = "cardcolor" | "purpleCard";
 
 type CardProps = {
-  projectId: number | string;
+  id?: number | string;
   variant: CardVariant;
-  title: string;
-  text: string;
-  img: string;
+  name: string;
+  description: string;
+  img?: string;
   likes: number;
   comments: number;
   className?: string;
@@ -33,10 +33,10 @@ function getRandomColor() {
 }
 
 export default function CardComponent({
-  projectId,
+  id,
   variant,
-  title,
-  text,
+  name,
+  description,
   img,
   likes,
   comments,
@@ -78,6 +78,14 @@ export default function CardComponent({
         ${className}
       `}
     >
+
+      {/* Afficher le name en haut pour purpleCard */}
+      {variant === "purpleCard" && (
+        <div className="px-3 pt-3 sm:px-4 md:px-6 text-white font-bold text-xl drop-shadow mb-2">
+          {name}
+        </div>
+      )}
+
       {/* Header pour cardcolor */}
       {variant === "cardcolor" && (
         <div className="flex items-center gap-3 px-3 pt-3 sm:px-4 md:px-6">
@@ -94,21 +102,21 @@ export default function CardComponent({
 
       {/* PURPLECARD: nature d'abord, puis image */}
       {variant === "purpleCard" && nature && (
-        <div className="px-3 pt-3 sm:px-4 md:px-6">
+        <div className="px-3 sm:px-4 md:px-6">
           <div className="mb-2 text-xs font-bold text-white uppercase tracking-wide text-center w-full">{nature}</div>
         </div>
       )}
 
       <div
         className={`relative w-full 
-          ${variant === "cardcolor" ? "mt-4" : "mt-2"} 
+          ${variant === "cardcolor" ? "mt-4" : "mt-0"} 
           ${variant === "cardcolor" ? "h-28 sm:h-36 md:h-40" : "h-32 sm:h-40 md:h-48"}
           ${variant === "purpleCard" ? "px-3 sm:px-4 md:px-6" : ""}
         `}
       >
         <img
           src={img}
-          alt={title}
+          alt={name}
           className="object-cover w-full h-full rounded-[30px]"
         />
       </div>
@@ -118,28 +126,22 @@ export default function CardComponent({
         <div>
           {variant === "cardcolor" && (
             <>
-              <h5 className="font-semibold text-white drop-shadow text-base sm:text-lg md:text-xl mb-1">{title}</h5>
+              <h5 className="font-semibold text-white drop-shadow text-base sm:text-lg md:text-xl mb-1">{description}</h5>
               <p className="font-light text-white/90 text-xs sm:text-sm md:text-base line-clamp-2">
-                {text}
+                {name}
               </p>
             </>
           )}
           {variant === "purpleCard" && (
             <>
-              <h5 className="mt-2 mb-2 font-semibold text-white drop-shadow text-base sm:text-lg md:text-xl">{title}</h5>
-              <p className="font-light text-white/90 text-xs sm:text-sm md:text-base line-clamp-2">
-                {text}
-              </p>
+              <h5 className="mt-2 mb-2 font-semibold text-white drop-shadow text-base sm:text-lg md:text-xl">{description}</h5>
+              {/* Le name est déjà affiché en haut, donc on ne le remet pas ici */}
             </>
           )}
           {/* Bouton détails qui redirige vers /details */}
           <button
             className="text-xs text-white underline mt-1 self-end"
-            
-           onClick={() => {
-          console.log('projectId envoyé:', projectId);
-          router.push(`/details/${projectId}`);
-        }}
+            onClick={() => router.push(`/details/${id}`)}
             type="button"
           >
             Détails

@@ -17,7 +17,7 @@ export type CardData = {
   date?: string | Date;
   className?: string;
   color?: string;
-  projectId?: number; // si nécessaire
-  title?: string;     // si nécessaire
-  text?: string;      // si nécessaire
+//  projectId?: number; // si nécessaire
+//  title?: string;     // si nécessaire
+//  text?: string;      // si nécessaire
 };
