@@ -26,7 +26,7 @@ const Feed = () => {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState<number | null>(null);
 
-  const hasMore = total === null || projects.length < total;
+  const hasMore = total === null || (Array.isArray(projects) && projects.length < total);
 
   const fetchProjects = useCallback(async (pageNum = 1) => {
     try {

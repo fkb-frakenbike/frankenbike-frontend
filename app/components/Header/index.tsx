@@ -54,29 +54,29 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <nav
-      className={`${isVisible ? 'translate-y-0' : '-translate-y-full'} fkb-bg fixed z-50 w-full py-8 transition-transform duration-300 ease-in-out`}
-    >
+    <nav className="fixed z-50 w-full bg-transparent py-8">
       <div className="relative mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className={`flex h-16 justify-between ${!isMobileMenuOpen && 'w-full'}`}>
+        <div className={`flex h-28 justify-between ${!isMobileMenuOpen && 'w-full'}`}>
           {/* Logo*/}
           <div className="flex items-center">
-            <Link href="/">
-              <h1 className="font-main text-3xl text-white">FKB</h1>
+            <Link href="/feed">
+              <h1 className="font-main text-3xl text-[#2d005e]">FKB</h1>
             </Link>
           </div>
           {/* Navigation links */}
-          <div className="hidden items-center space-x-8 md:flex">
+          <div
+            className={`h-full ${isVisible ? 'translate-y-0' : '-translate-y-full'} hidden items-center space-x-8 transition-transform duration-300 ease-in-out md:flex`}
+          >
             {navLinks.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-md px-3 py-2 text-lg text-white transition-colors hover:text-gray-50 ${pathname === link.href ? 'font-bold' : ''}`}
+                className={`rounded-md px-3 py-2 text-lg text-[#2d005e] transition-colors hover:text-gray-50 ${pathname === link.href ? 'font-bold' : ''}`}
               >
                 {link.label}
               </Link>
             ))}
-            {user && <span className="hidden text-white sm:block">{user.email}</span>}
+            {user && <span className="hidden text-[#2d005e] sm:block">{user.email}</span>}
             {user && <LogoutButton setUser={setUser} setError={setError} />}
           </div>
         </div>
@@ -84,12 +84,12 @@ const Header: React.FC = () => {
         <div className="flex items-center md:hidden">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-gray-100 hover:text-gray-50 focus:outline-none"
+            className="inline-flex items-center justify-center rounded-md p-2 text-[#2d005e] hover:bg-gray-100 hover:text-gray-50 focus:outline-none"
           >
             {isMobileMenuOpen ? (
-              <BiX className="h-6 w-6 text-white" />
+              <BiX className="h-6 w-6 text-[#2d005e]" />
             ) : (
-              <BiMenu className="h-6 w-6 text-white" />
+              <BiMenu className="h-6 w-6 text-[#2d005e]" />
             )}
           </button>
         </div>
@@ -105,7 +105,7 @@ const Header: React.FC = () => {
               key={link.href}
               href={link.href}
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700 ${pathname === link.href ? 'font-bold' : ''}`}
+              className={`block rounded-md px-3 py-2 text-base font-medium text-[#2d005e] hover:bg-gray-700 ${pathname === link.href ? 'font-bold' : ''}`}
             >
               {link.label}
             </Link>

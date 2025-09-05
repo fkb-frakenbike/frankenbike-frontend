@@ -16,18 +16,19 @@ type Project = {
 const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
   return (
     <div className="grid min-h-full grid-cols-1 justify-items-center gap-6">
-      {projects.map(project => (
-        <CardComponent
-          key={project.id}
-          title={project.title}
-          text={project.description}
-          img={project.imageUrl}
-          comments={project.comments.length}
-          date={project.updatedAt}
-          userName={project.user.email}
-          variant="cardcolor"
-        />
-      ))}
+      {Array.isArray(projects) &&
+        projects.map(project => (
+          <CardComponent
+            key={project.id}
+            title={project.title}
+            text={project.description}
+            img={project.imageUrl}
+            comments={project.comments.length}
+            date={project.updatedAt}
+            userName={project.user.email}
+            variant="cardcolor"
+          />
+        ))}
     </div>
   );
 };
