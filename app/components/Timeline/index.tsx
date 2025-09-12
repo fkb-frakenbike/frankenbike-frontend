@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
-import Carousel from "../CarouselComponent";
+import Carou;
 import api from '../../lib/axios'; 
 import axios, { AxiosError } from 'axios';
 import { CardData, CardVariant } from  '../../types'

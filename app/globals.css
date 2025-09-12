@@ -6,7 +6,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: rgb(243 244 246 1);
   --foreground: #171717;
   --font-title: 'Kumar One', cursive;
   --font-subtitle: 'Karantina', cursive;
@@ -14,15 +14,37 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #0b1220;
     --foreground: #ededed;
   }
 }
 
-body {
+#root,
+.__next {
+  /* Next.js (pages/) */
+  min-height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  min-height: 100vh; /* fallback anciens navigateurs */
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  overscroll-behavior: contain;
+}
+@supports (height: 100dvh) {
+  body,
+  html {
+    min-height: 100dvh;
+  }
 }
 
 .font-main {
@@ -35,4 +57,16 @@ body {
 
 .fkb-bg {
   background: linear-gradient(to bottom, #2d005e 0%, #2d005e 50%, rgba(49, 0, 102, 0.7) 100%);
+}
+
+.page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* focus visible pour l'accessibilité */
+:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
 }
