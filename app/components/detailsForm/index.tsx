@@ -48,7 +48,7 @@ export default function ComponentDetailsWrapper({ id }: Props) {
   if (error) return <p className="text-red-500">{error}</p>;
   if (!component) return <p>Aucun composant trouvé.</p>;
 return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-[#2C0857] to-purple-400 p-6 relative">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-[#2C0857] to-purple-400 p-6 relative pt-24 md:pt-0">
       {/* Côté gauche : image + titre */}
       <div className="md:w-1/2 flex flex-col items-center justify-center mb-8 md:mb-0">
         <div className="mt-12 md:mt-0 w-52 h-32 md:w-[350px] md:h-[220px] lg:w-[449px] lg:h-[283px] xl:w-[449px] xl:h-[283px] 2xl:w-[449px] 2xl:h-[283px] rounded-[30px] overflow-hidden shadow-xl bg-white">

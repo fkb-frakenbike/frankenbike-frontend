@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
-import Carou;
+import Carousel from "../Carousel";
 import api from '../../lib/axios'; 
 import axios, { AxiosError } from 'axios';
 import { CardData, CardVariant } from  '../../types'
@@ -103,7 +103,7 @@ export default function TimelinePage() {
   if (error) return <p className="text-red-300 text-center">{error}</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2C0857] to-purple-400 p-2 flex flex-col gap-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#2C0857] to-purple-400 p-2 flex flex-col gap-4  pt-12">
       <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow text-center mt-16 mb-4">
         Timeline
       </h1>
