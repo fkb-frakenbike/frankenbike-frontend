@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import LoginCheck from '../loginCheck';
+import LoginCheck from '../LoginCheck';
 import { useRouter } from 'next/navigation';
 
 jest.mock('next/navigation', () => ({
