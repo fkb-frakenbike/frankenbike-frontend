@@ -133,7 +133,8 @@ export default function TimelinePage() {
       </div>
 
       {/* Carousel affichant les composants du projet sélectionné */}
-      <Carousel data={components} />
+     <Carousel data={components} />
+
     </div>
   );
 }
