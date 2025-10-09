@@ -30,10 +30,15 @@ export default function TimelinePage() {
     const checkAuthAndFetch = async () => {
       try {
         const me = await api.get('/api/me');
-        setUser(me.data);
-        const userId = me.data.id;
+setUser(me.data);
+const userId = me.data?.id;
 
-        const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
+if (!userId || typeof userId !== 'number') {
+  setError("Impossible de récupérer l'ID utilisateur. Êtes-vous bien connecté ?");
+  return;
+}
+
+const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
         const fetchedProjects = response.data;
 
         setProjects(fetchedProjects);
@@ -133,8 +138,7 @@ export default function TimelinePage() {
       </div>
 
       {/* Carousel affichant les composants du projet sélectionné */}
-     <Carousel data={components} />
-
+      <Carousel data={components} />
     </div>
   );
 }

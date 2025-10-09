@@ -99,7 +99,7 @@ const Feed = () => {
         <FeedList projects={projects} />
       )}
       {loadingMore && <div className="py-4 text-center text-gray-500">Chargement…</div>}
-      <Carousel data={cardsData} vertical />
+      <Carousel data={cardsData}  />
 
     </div>
   );
