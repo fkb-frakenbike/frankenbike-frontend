@@ -15,6 +15,16 @@ const ORIGIN_OPTIONS = [
   { value: 'restored', label: 'Restauré' },
   { value: 'upcycled', label: 'Upcyclé' },
 ];
+const CATEGORY_OPTIONS = [
+  { value: 'frame', label: 'Cadre' },
+  { value: 'brakes', label: 'Freins' },
+  { value: 'fork_and_direction', label: 'Fourche et direction' },
+  { value: 'seat_parts', label: 'Selle et tige de selle' },
+  { value: 'drivetrain', label: 'Transmission' },
+  { value: 'wheels', label: 'Roues' },
+  { value: 'accessories', label: 'Accessoires' },
+  { value: 'other', label: 'Autre' },
+];
 
 type AddComponentFormProps = {
   projectId?: number;
@@ -29,21 +39,18 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [origin, setOrigin] = useState('bought_used'); // valeur par défaut à adapter
+  const [category, setCategory] = useState(''); // valeur par défaut à adapter
   const [preview, setPreview] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
-    api.get('/api/me').then(res => {
-      setUserId(res.data.id);
-    });
-  }, []);
-
-  useEffect(() => {
     api
-      .get(`/api/users/${userId}/projects`)
+      .get('/api/me')
       .then(res => {
-        setProjects(res.data.data);
+        // res.data est un tableau de projets
+        setProjects(res.data);
+        // Optionnel : sélectionne le projet si projectId est fourni
         if (projectId) {
           setSelectedProjectId(projectId);
         }
@@ -69,13 +76,14 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
 
     const formData = new FormData();
     formData.append('name', name);
+    formData.append('category', category);
     formData.append('description', description);
     formData.append('origin', origin);
     formData.append('file', selectedImage);
 
     setLoading(true);
     try {
-      const res = await api.post(`/api/projects/${projectId}/components`, formData, {
+      const res = await api.post(`/api/projects/${selectedProjectId}/components`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setPreview(res.data);
@@ -90,7 +98,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6 p-4">
       {/* Partie gauche : Title + Description */}
 
-      <div>
+      <div className="flex flex-col gap-4 px-6">
         <label htmlFor="project" className="mb-1 block text-sm font-medium text-white">
           Projet
         </label>
@@ -127,6 +135,29 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
             className="rounded- w-full max-w-[600px] border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
           />
 
+          <div>
+            <label htmlFor="category" className="mb-1 block text-sm font-medium text-white">
+              Catégorie
+            </label>
+            <select
+              id="category"
+              name="category"
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="w-full rounded border border-gray-300 px-3 py-2 text-black"
+              required
+            >
+              <option value="" disabled>
+                Choisir une catégorie
+              </option>
+              {CATEGORY_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <InputField
             label="Description"
             type="text"
@@ -160,7 +191,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
         </div>
 
         {/* Partie droite : Upload + bouton */}
-        <div className="mt-10 flex w-full flex-col gap-4 md:w-1/3">
+        <div className="flex w-full flex-1 flex-col gap-4 px-6 md:w-1/3">
           <input
             type="file"
             accept="image/*"
@@ -171,24 +202,18 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
           />
 
           {selectedImage && (
-            <div className="ml-2 max-h-48 overflow-auto text-white">
-              <p>{selectedImage.name}</p>
-              <img
-                src={URL.createObjectURL(selectedImage)}
-                alt="Aperçu"
-                className="mt-2 max-h-40 rounded"
-              />
+            <div className="self-center overflow-auto text-white">
+              <img src={URL.createObjectURL(selectedImage)} alt="Aperçu" className="mt-2 rounded" />
             </div>
           )}
-
-          <button
-            type="submit"
-            className="flex w-full justify-center rounded-full border border-white bg-transparent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            Envoyer
-          </button>
         </div>
       </div>
+      <button
+        type="submit"
+        className="mx-6 flex justify-center rounded-full border border-white bg-transparent px-6 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      >
+        Envoyer
+      </button>
     </form>
   );
 };
