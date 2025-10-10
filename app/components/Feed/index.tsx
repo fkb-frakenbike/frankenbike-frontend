@@ -30,7 +30,7 @@ const Feed = () => {
 
   const hasMore = total === null || (Array.isArray(projects) && projects.length < total);
 
- const cardsData = projects.map(project => ({
+ const cardsData = projects?.map((project) => ({
   id: project.id,
   name: project.title,            // Utilise 'name' ici comme attendu par CardData
   description: project.description,
