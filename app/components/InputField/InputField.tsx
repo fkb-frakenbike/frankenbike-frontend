@@ -1,14 +1,18 @@
 import React from 'react';
 import { VscEye, VscEyeClosed } from 'react-icons/vsc';
+
 interface InputFieldProps {
   label: string;
   type: string;
   id: string;
   name: string;
-  value: string;
+  value?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
   className?: string;
+  accept?: string;
+  multiple?: boolean;
+  style?: React.CSSProperties;
 }
 
 export default function InputField({
@@ -20,6 +24,9 @@ export default function InputField({
   onChange,
   required = false,
   className = '',
+  accept,
+  multiple,
+  style,
 }: InputFieldProps) {
   const [passwordType, setPasswordType] = React.useState('password');
   const [svgIcon, setSvgIcon] = React.useState(<VscEyeClosed />);
@@ -45,10 +52,13 @@ export default function InputField({
           type={isPasswordField ? passwordType : type}
           id={id}
           name={name}
-          value={value}
+          value={type === 'file' ? undefined : value}
           onChange={onChange}
           required={required}
           className={className}
+          accept={accept}
+          multiple={multiple}
+          style={style}
         />
         {isPasswordField && (
           <span

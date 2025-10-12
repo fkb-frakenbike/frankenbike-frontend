@@ -30,6 +30,20 @@ type AddComponentFormProps = {
   projectId?: number;
 };
 
+type ComponentPreview = {
+  id: number;
+  name: string;
+  description: string;
+  origin: string;
+  category: string;
+  createdAt: string;
+  photoS3Key: string;
+  photoMimeType: string;
+  photoSize: number;
+};
+
+type PreviewState = ComponentPreview | { error: string } | null;
+
 const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
   // Etat pour plusieurs fichiers
   // const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -40,9 +54,8 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
   const [description, setDescription] = useState('');
   const [origin, setOrigin] = useState('bought_used'); // valeur par défaut à adapter
   const [category, setCategory] = useState(''); // valeur par défaut à adapter
-  const [preview, setPreview] = useState<any>(null);
+  const [preview, setPreview] = useState<PreviewState>(null);
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     api
@@ -88,7 +101,9 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
       });
       setPreview(res.data);
     } catch (err) {
-      setPreview({ error: "Erreur lors de l'envoi" });
+      setPreview({
+        error: `Erreur lors de l'envoi: ${err instanceof Error ? err.message : String(err)}`,
+      });
     } finally {
       setLoading(false);
     }
@@ -125,17 +140,17 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
       <div className="flex w-full flex-col gap-4 md:flex-row md:items-start md:gap-8">
         <div className="flex flex-1 flex-col gap-4 px-6">
           <InputField
-            label="Title"
+            label="Nom"
             type="text"
-            id="title"
-            name="title"
+            id="name"
+            name="name"
             required
             value={name}
             onChange={e => setName(e.target.value)}
-            className="rounded- w-full max-w-[600px] border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+            className="w-full max-w-[600px] rounded border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
           />
 
-          <div>
+          <div className="w-full max-w-[600px]">
             <label htmlFor="category" className="mb-1 block text-sm font-medium text-white">
               Catégorie
             </label>
@@ -169,9 +184,9 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
             className="h-36 w-full max-w-[600px] rounded-none border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 md:h-40"
           />
 
-          <div>
+          <div className="w-full max-w-[600px]">
             <label htmlFor="origin" className="mb-1 block text-sm font-medium text-white">
-              Origin
+              Origine
             </label>
             <select
               id="origin"
@@ -191,13 +206,16 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
         </div>
 
         {/* Partie droite : Upload + bouton */}
-        <div className="flex w-full flex-1 flex-col gap-4 px-6 md:w-1/3">
-          <input
+        <div className="flex w-full flex-1 flex-col px-6 md:w-1/3">
+          <InputField
+            label="Photo du composant"
+            id="photo"
+            name="file"
             type="file"
             accept="image/*"
             multiple
             onChange={handleImageUpload}
-            className="block w-full rounded border border-gray-300 bg-white p-2"
+            className="block max-h-36 w-full rounded border border-gray-300 bg-white p-1"
             style={{ minWidth: 120, minHeight: 32 }}
           />
 
@@ -210,10 +228,20 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
       </div>
       <button
         type="submit"
+        disabled={loading}
         className="mx-6 flex justify-center rounded-full border border-white bg-transparent px-6 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       >
-        Envoyer
+        {loading ? 'Envoi en cours...' : 'Envoyer'}
       </button>
+      {preview && (
+        <div className="mt-4">
+          {'error' in preview ? (
+            <span className="text-red-500">{preview.error}</span>
+          ) : (
+            <span className="text-green-500">Composant envoyé avec succès !</span>
+          )}
+        </div>
+      )}
     </form>
   );
 };
