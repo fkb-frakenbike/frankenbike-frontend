@@ -54,7 +54,7 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <nav className="fixed z-50 w-full bg-transparent py-8">
+    <nav className="fixed z-50 w-full bg-transparent py-2 top-0">
       <div className="relative mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className={`flex h-28 justify-between ${!isMobileMenuOpen && 'w-full'}`}>
           {/* Logo*/}
