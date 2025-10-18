@@ -31,7 +31,7 @@ It provides authentication (login/register/logout), a feed with infinite scroll,
 | Card system           | Dynamic gradient cards + actions       | [app/components/Card/index.tsx](app/components/Card/index.tsx)                                                                                       |
 | Carousel              | Swipe / button navigation              | [app/components/Carousel/index.tsx](app/components/Carousel/index.tsx)                                                                               |
 | Responsive header     | Auto-hide on scroll, mobile menu       | [app/components/Header/index.tsx](app/components/Header/index.tsx)                                                                                   |
-| Details page          | Layout for extended content            | [app/details/page.tsx](app/details/page.tsx)                                                                                                         |
+| Details page          | Layout for extended content            | [app/bike-components/[id]/details/page.tsx](app/bike-components/[id]/details/page.tsx)                                                               |
 | Form components       | Reusable input with password toggle    | [app/components/InputField/InputField.tsx](app/components/InputField/InputField.tsx)                                                                 |
 | API client            | Centralized Axios instance             | [app/lib/axios.ts](app/lib/axios.ts)                                                                                                                 |
 
@@ -59,7 +59,9 @@ app/
   feed/ page.tsx
   login/ page.tsx
   register/ page.tsx
-  details/ page.tsx
+  bike-components/
+    [id]/
+      details/ page.tsx
   layout.tsx
   page.tsx (landing / sample fetch)
 tests/

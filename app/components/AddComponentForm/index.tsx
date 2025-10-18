@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import InputField from '../InputField/InputField';
 import api from '../../lib/axios';
 import { Project } from '@/app/types/projects';
+import { useRouter } from 'next/navigation';
+import { useProject } from '@/app/context/ProjectContext';
 
 const ORIGIN_OPTIONS = [
   { value: 'homemade', label: 'Fait maison' },
@@ -57,19 +59,23 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
   const [preview, setPreview] = useState<PreviewState>(null);
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
+  const { setSelectedProjectId: setContextProjectId } = useProject();
+
   useEffect(() => {
     api
       .get('/api/me')
       .then(res => {
         // res.data est un tableau de projets
-        setProjects(res.data);
+        setProjects(res.data.projects);
         // Optionnel : sélectionne le projet si projectId est fourni
         if (projectId) {
           setSelectedProjectId(projectId);
+          setContextProjectId(projectId);
         }
       })
       .catch(() => setProjects([]));
-  }, [projectId]);
+  }, [projectId, setContextProjectId]);
 
   // Handle upload multiple files
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +106,8 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setPreview(res.data);
+      setContextProjectId(Number(selectedProjectId));
+      router.push('/timeline');
     } catch (err) {
       setPreview({
         error: `Erreur lors de l'envoi: ${err instanceof Error ? err.message : String(err)}`,
@@ -110,139 +118,148 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6 p-4">
-      {/* Partie gauche : Title + Description */}
+    <div className="flex flex-col gap-6 p-4">
+      <h1 className="mb-10 block px-6 text-center text-2xl font-medium text-white">
+        Ajouter un composant
+      </h1>
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6">
+        {/* Partie gauche : Title + Description */}
 
-      <div className="flex flex-col gap-4 px-6">
-        <label htmlFor="project" className="mb-1 block text-sm font-medium text-white">
-          Projet
-        </label>
-        <select
-          id="project"
-          name="project"
-          value={selectedProjectId}
-          onChange={e => setSelectedProjectId(Number(e.target.value))}
-          className="w-full rounded border border-gray-300 px-3 py-2 text-black"
-          required
-        >
-          <option value="" disabled>
-            Choisir un projet
-          </option>
-          {projects &&
-            projects?.length > 0 &&
-            projects.map(project => (
-              <option key={project.id} value={project.id}>
-                {project.title}
-              </option>
-            ))}
-        </select>
-      </div>
-      <div className="flex w-full flex-col gap-4 md:flex-row md:items-start md:gap-8">
-        <div className="flex flex-1 flex-col gap-4 px-6">
-          <InputField
-            label="Nom"
-            type="text"
-            id="name"
-            name="name"
+        <div className="flex flex-col gap-4 px-6">
+          <label htmlFor="project" className="mb-1 block text-sm font-medium text-white">
+            Projet
+          </label>
+          <select
+            id="project"
+            name="project"
+            value={selectedProjectId}
+            onChange={e => setSelectedProjectId(Number(e.target.value))}
+            className="w-full rounded border border-gray-300 px-3 py-2 text-black"
             required
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className="w-full max-w-[600px] rounded border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-          />
-
-          <div className="w-full max-w-[600px]">
-            <label htmlFor="category" className="mb-1 block text-sm font-medium text-white">
-              Catégorie
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-black"
-              required
-            >
-              <option value="" disabled>
-                Choisir une catégorie
-              </option>
-              {CATEGORY_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
+          >
+            <option value="" disabled>
+              Choisir un projet
+            </option>
+            {projects &&
+              projects?.length > 0 &&
+              projects.map(project => (
+                <option key={project.id} value={project.id}>
+                  {project.title}
                 </option>
               ))}
-            </select>
-          </div>
-
-          <InputField
-            label="Description"
-            type="text"
-            id="description"
-            name="description"
-            required
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            className="h-36 w-full max-w-[600px] rounded-none border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 md:h-40"
-          />
-
-          <div className="w-full max-w-[600px]">
-            <label htmlFor="origin" className="mb-1 block text-sm font-medium text-white">
-              Origine
-            </label>
-            <select
-              id="origin"
-              name="origin"
-              value={origin}
-              onChange={e => setOrigin(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-black"
-              required
-            >
-              {ORIGIN_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          </select>
         </div>
+        <div className="flex w-full flex-col gap-4 md:flex-row md:items-start md:gap-8">
+          <div className="flex flex-1 flex-col gap-4 px-6">
+            <InputField
+              label="Nom"
+              type="text"
+              id="name"
+              name="name"
+              required
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="w-full max-w-[600px] rounded border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+            />
 
-        {/* Partie droite : Upload + bouton */}
-        <div className="flex w-full flex-1 flex-col px-6 md:w-1/3">
-          <InputField
-            label="Photo du composant"
-            id="photo"
-            name="file"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageUpload}
-            className="block max-h-36 w-full rounded border border-gray-300 bg-white p-1"
-            style={{ minWidth: 120, minHeight: 32 }}
-          />
-
-          {selectedImage && (
-            <div className="self-center overflow-auto text-white">
-              <img src={URL.createObjectURL(selectedImage)} alt="Aperçu" className="mt-2 rounded" />
+            <div className="w-full max-w-[600px]">
+              <label htmlFor="category" className="mb-1 block text-sm font-medium text-white">
+                Catégorie
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                className="w-full rounded border border-gray-300 px-3 py-2 text-black"
+                required
+              >
+                <option value="" disabled>
+                  Choisir une catégorie
+                </option>
+                {CATEGORY_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
+
+            <InputField
+              label="Description"
+              type="text"
+              id="description"
+              name="description"
+              required
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              className="h-36 w-full max-w-[600px] rounded-none border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 md:h-40"
+            />
+
+            <div className="w-full max-w-[600px]">
+              <label htmlFor="origin" className="mb-1 block text-sm font-medium text-white">
+                Origine
+              </label>
+              <select
+                id="origin"
+                name="origin"
+                value={origin}
+                onChange={e => setOrigin(e.target.value)}
+                className="w-full rounded border border-gray-300 px-3 py-2 text-black"
+                required
+              >
+                {ORIGIN_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Partie droite : Upload + bouton */}
+          <div className="flex w-full flex-1 flex-col px-6 md:w-1/3">
+            <InputField
+              label="Photo du composant"
+              id="photo"
+              name="file"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className="block max-h-36 w-full rounded border border-gray-300 bg-white p-1"
+              style={{ minWidth: 120, minHeight: 32 }}
+            />
+
+            {selectedImage && (
+              <div className="self-center overflow-auto text-white">
+                <img
+                  src={URL.createObjectURL(selectedImage)}
+                  alt="Aperçu"
+                  className="mt-2 rounded"
+                />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="mx-6 flex justify-center rounded-full border border-white bg-transparent px-6 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      >
-        {loading ? 'Envoi en cours...' : 'Envoyer'}
-      </button>
-      {preview && (
-        <div className="mt-4">
-          {'error' in preview ? (
-            <span className="text-red-500">{preview.error}</span>
-          ) : (
-            <span className="text-green-500">Composant envoyé avec succès !</span>
-          )}
-        </div>
-      )}
-    </form>
+        <button
+          type="submit"
+          disabled={loading}
+          className="mx-6 flex justify-center rounded-full border border-white bg-transparent px-6 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+          {loading ? 'Envoi en cours...' : 'Envoyer'}
+        </button>
+        {preview && (
+          <div className="mt-4">
+            {'error' in preview ? (
+              <span className="text-red-500">{preview.error}</span>
+            ) : (
+              <span className="text-green-500">Composant envoyé avec succès !</span>
+            )}
+          </div>
+        )}
+      </form>
+    </div>
   );
 };
 

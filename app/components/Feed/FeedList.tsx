@@ -21,13 +21,14 @@ const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
         projects.map(project => (
           <CardComponent
             key={project.id}
-            title={project.title}
-            text={project.description}
+            name={project.title}
+            description={project.description}
             img={project.imageUrl}
             comments={project.comments.length}
             date={project.updatedAt}
             userName={project.user.email}
             variant="cardcolor"
+            likes={0}
           />
         ))
       ) : (
