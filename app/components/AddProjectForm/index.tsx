@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import InputField from '../InputField/InputField';
 import api from '@/app/lib/axios';
+import { extractErrorMessage } from '@/app/lib/errorMessage';
 
 export default function AddProjectForm() {
   // Etat pour plusieurs fichiers
@@ -44,9 +45,8 @@ export default function AddProjectForm() {
       setTitle('');
       setDescription('');
       setSelectedImages([]);
-    } catch (err) {
-      console.error('Erreur création projet', err);
-      setError('Erreur lors de la création du projet');
+    } catch (error: unknown) {
+      setError(extractErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -58,6 +58,7 @@ export default function AddProjectForm() {
         Mon nouveau projet
       </h1>
       <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6">
+        {error && <p className="text-red-500">{error}</p>}
         <div className="flex w-full flex-col gap-4 md:flex-row md:items-start md:gap-8">
           {/* Partie gauche : Title + Description */}
           <div className="flex flex-1 flex-col gap-4 px-6">

@@ -155,11 +155,19 @@ export default function CardComponent({
             onClick={() => setIsSaved(v => !v)}
             className="flex min-w-[28px] items-center gap-1 rounded-full bg-white/90 px-1 py-1 transition-colors duration-200 hover:bg-white sm:min-w-[36px] sm:px-2 sm:py-1"
           >
-            <img
-              src={'/SvgSite/save.png'}
-              alt="Enregistrer"
-              className="mx-auto h-4 w-4 sm:h-5 sm:w-5"
-            />
+            {isSaved ? (
+              <img
+                src={'/SvgSite/isSaved.png'}
+                alt="Enregistrer"
+                className="mx-auto h-4 w-4 sm:h-5 sm:w-5"
+              />
+            ) : (
+              <img
+                src={'/SvgSite/save.png'}
+                alt="Enregistrer"
+                className="mx-auto h-4 w-4 sm:h-5 sm:w-5"
+              />
+            )}
           </button>
         </div>
       </div>
