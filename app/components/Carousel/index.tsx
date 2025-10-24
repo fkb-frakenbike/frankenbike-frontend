@@ -90,10 +90,17 @@ export default function Carousel({ data }: CarouselProps) {
           const offset = i - center;
           const isActive = idx === active;
 
+          let marginClass = '';
+          if (offset < 0) {
+            marginClass = '-ml-8 md:-ml-12 lg:-ml-20';
+          } else if (offset > 0) {
+            marginClass = '-mr-8 md:-mr-12 lg:-mr-20';
+          }
+
           return (
             <motion.div
               key={`${idx}-${i}`}
-              className={`transition-all duration-300 ${isActive ? 'z-20' : 'z-10'} `}
+              className={`transition-all duration-300 ${isActive ? 'z-20' : 'z-10'} ${marginClass}`}
               style={{
                 pointerEvents: 'auto',
               }}
