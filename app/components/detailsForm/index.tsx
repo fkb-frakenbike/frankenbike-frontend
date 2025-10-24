@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import api from '../../lib/axios';
+import { extractErrorMessage } from '@/app/lib/errorMessage';
 
 export type DetailsProps = {
   img: string;
@@ -19,10 +20,6 @@ export default function ComponentDetailsWrapper({ id }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  if (!id || !/^\d+$/.test(id)) {
-    return <p className="text-red-500">ID de composant invalide</p>;
-  }
-
   useEffect(() => {
     const fetchComponent = async () => {
       try {
@@ -33,19 +30,18 @@ export default function ComponentDetailsWrapper({ id }: Props) {
           text: res.data.description,
           comment: 'Commentaire statique pour l’instant',
         });
-      } catch (error: any) {
-        const message =
-          error.response?.data?.message ||
-          error.message ||
-          'Erreur lors du chargement du composant';
-        setError(message);
+      } catch (error: unknown) {
+        setError(extractErrorMessage(error));
       } finally {
         setLoading(false);
       }
     };
-
     fetchComponent();
   }, [id]);
+
+  if (!id || !/^\d+$/.test(id)) {
+    return <p className="text-red-500">ID de composant invalide</p>;
+  }
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
