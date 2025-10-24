@@ -26,12 +26,12 @@ It provides authentication (login/register/logout), a feed with infinite scroll,
 | Feature               | Description                            | Key Files                                                                                                                                            |
 | --------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Authentication        | Login, register, session check, logout | [app/login/page.tsx](app/login/page.tsx), [app/register/page.tsx](app/register/page.tsx), [app/components/LogoutButton](app/components/LogoutButton) |
-| Session auto-redirect | Redirects logged users away from login | [app/services/loginCheck.tsx](app/services/loginCheck.tsx)                                                                                           |
+| Session auto-redirect | Redirects logged users away from login | [app/services/LoginCheck.tsx](app/services/LoginCheck.tsx)                                                                                           |
 | Feed w/ pagination    | Incremental loading + infinite scroll  | [app/components/Feed/index.tsx](app/components/Feed/index.tsx)                                                                                       |
 | Card system           | Dynamic gradient cards + actions       | [app/components/Card/index.tsx](app/components/Card/index.tsx)                                                                                       |
 | Carousel              | Swipe / button navigation              | [app/components/Carousel/index.tsx](app/components/Carousel/index.tsx)                                                                               |
 | Responsive header     | Auto-hide on scroll, mobile menu       | [app/components/Header/index.tsx](app/components/Header/index.tsx)                                                                                   |
-| Details page          | Layout for extended content            | [app/details/page.tsx](app/details/page.tsx)                                                                                                         |
+| Details page          | Layout for extended content            | [app/bike-components/[id]/details/page.tsx](app/bike-components/[id]/details/page.tsx)                                                               |
 | Form components       | Reusable input with password toggle    | [app/components/InputField/InputField.tsx](app/components/InputField/InputField.tsx)                                                                 |
 | API client            | Centralized Axios instance             | [app/lib/axios.ts](app/lib/axios.ts)                                                                                                                 |
 
@@ -51,7 +51,7 @@ app/
     LogoutButton/
     RegisterForm/
   services/
-    loginCheck.tsx
+    LoginCheck.tsx
   lib/
     axios.ts
   types/
@@ -59,7 +59,9 @@ app/
   feed/ page.tsx
   login/ page.tsx
   register/ page.tsx
-  details/ page.tsx
+  bike-components/
+    [id]/
+      details/ page.tsx
   layout.tsx
   page.tsx (landing / sample fetch)
 tests/
@@ -81,7 +83,7 @@ NEXT_PUBLIC_API_BASE=http://localhost:8000
 Used in:
 
 - [`app/lib/axios.ts`](app/lib/axios.ts)
-- [`app/services/loginCheck.tsx`](app/services/loginCheck.tsx)
+- [`app/services/LoginCheck.tsx`](app/services/LoginCheck.tsx)
 - Forms & API-bound components
 
 ---
@@ -96,7 +98,7 @@ Run:
 npm test
 ```
 
-Example: [`app/services/__tests__/loginCheck.spec.tsx`](app/services/__tests__/loginCheck.spec.tsx)
+Example: [`app/services/__tests__/LoginCheck.spec.tsx`](app/services/__tests__/LoginCheck.spec.tsx)
 
 ### End-to-End (Playwright)
 
@@ -235,7 +237,7 @@ Feed expects response shape:
 | [`RegisterForm`](app/components/RegisterForm/index.tsx) | Signup form w/ password confirmation |
 | [`LogoutButton`](app/components/LogoutButton/index.tsx) | Session termination                  |
 | [`Header`](app/components/Header/index.tsx)             | Responsive navbar with scroll hide   |
-| [`loginCheck`](app/services/loginCheck.tsx)             | Redirects authenticated users        |
+| [`LoginCheck`](app/services/LoginCheck.tsx)             | Redirects authenticated users        |
 
 ---
 

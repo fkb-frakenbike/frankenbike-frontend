@@ -63,7 +63,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="fkb-bg flex min-h-screen items-center justify-center">
+    <div className="fkb-bg flex min-h-screen items-center justify-center pt-28">
       <div className="mx-auto my-10 max-w-md rounded-lg bg-transparent p-8">
         <h1 className="font-other mb-6 text-center text-4xl font-semibold text-white">Sign in</h1>
 

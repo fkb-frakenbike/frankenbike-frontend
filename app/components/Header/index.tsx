@@ -60,25 +60,31 @@ const Header: React.FC = () => {
           {/* Logo*/}
           <div className="flex items-center">
             <Link href="/feed">
-              <h1 className="font-main text-3xl text-[#2d005e]">FKB</h1>
+              <h1
+                className={`font-main text-3xl ${pathname === '/feed' ? 'text-[#2d005e]' : 'text-white'}`}
+              >
+                FKB
+              </h1>
             </Link>
           </div>
           {/* Navigation links */}
-          <div
-            className={`h-full ${isVisible ? 'translate-y-0' : '-translate-y-full'} hidden items-center space-x-8 transition-transform duration-300 ease-in-out md:flex`}
-          >
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`rounded-md px-3 py-2 text-lg text-[#2d005e] transition-colors hover:text-gray-50 ${pathname === link.href ? 'font-bold' : ''}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {user && <span className="hidden text-[#2d005e] sm:block">{user.email}</span>}
-            {user && <LogoutButton setUser={setUser} setError={setError} />}
-          </div>
+          {!['/login', '/register'].includes(pathname) && (
+            <div
+              className={`h-full ${isVisible ? 'translate-y-0' : '-translate-y-full'} hidden items-center space-x-8 transition-transform duration-300 ease-in-out md:flex`}
+            >
+              {navLinks.map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`rounded-md px-3 py-2 text-lg text-[#2d005e] transition-colors hover:text-gray-50 ${pathname === link.href ? 'font-bold' : ''}`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {user && <span className="hidden text-[#2d005e] sm:block">{user.email}</span>}
+              {user && <LogoutButton setUser={setUser} setError={setError} />}
+            </div>
+          )}
         </div>
         {/* Mobile menu */}
         <div className="flex items-center md:hidden">

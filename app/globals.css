@@ -59,6 +59,11 @@ html {
   background: linear-gradient(to bottom, #2d005e 0%, #2d005e 50%, rgba(49, 0, 102, 0.7) 100%);
 }
 
+.fkb-bg-diagonal {
+  background: linear-gradient(to bottom right, #2c0857 0%, #2c0857 50%, #a78bfa 100%);
+}
+/* bg-gradient-to-br from-[#2C0857] to-purple-400 */
+
 .page {
   min-height: 100svh;
   display: flex;

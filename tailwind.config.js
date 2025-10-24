@@ -9,8 +9,9 @@ module.exports = {
     extend: {
       colors: {
         background: 'var(--background)',
-        foreground: 'var(--foreground)',
         'fkb-bg': 'var(--fkb-bg)',
+        'fkb-bg-diagonal': 'var(--fkb-bg-diagonal)',
+        foreground: 'var(--foreground)',
       },
     },
   },
