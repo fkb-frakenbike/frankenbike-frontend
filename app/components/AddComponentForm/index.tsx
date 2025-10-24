@@ -67,7 +67,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
       .get('/api/me')
       .then(res => {
         // res.data est un tableau de projets
-        setProjects(res.data.projects);
+        setProjects(res.data);
         // Optionnel : sélectionne le projet si projectId est fourni
         if (projectId) {
           setSelectedProjectId(projectId);
