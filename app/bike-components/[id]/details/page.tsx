@@ -1,9 +1,8 @@
-import { PageProps } from '@/.next/types/app/page';
 import ComponentDetailsWrapper from '@/app/components/detailsForm';
 
-export default async function DetailsPage({ params }: PageProps) {
+export default async function DetailsPage({ params }: PageProps<'/bike-components/[id]/details'>) {
   const resolvedParams = params ? await params : {};
-  const id = resolvedParams.id;
+  const id = (resolvedParams as { id: string }).id;
 
   return <ComponentDetailsWrapper id={id} />;
 }

@@ -1,7 +1,6 @@
-import { PageProps } from '@/.next/types/app/page';
 import AddComponentForm from '../components/AddComponentForm';
 
-export default async function AddComponentPage({ searchParams }: PageProps) {
+export default async function AddComponentPage({ searchParams }: PageProps<'/addComponent'>) {
   const params = searchParams ? await searchParams : {};
   const projectId = params?.projectId ? Number(params.projectId) : undefined;
   return (

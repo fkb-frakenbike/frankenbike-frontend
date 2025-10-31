@@ -20,21 +20,28 @@ type ProjectData = {
 export default function TimelinePage({ projectId }: { projectId?: number }) {
   const router = useRouter();
   const [components, setComponents] = useState<CardData[]>([]);
-  const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [projects, setProjects] = useState<ProjectData[]>([]); // Tableaux initialisés à []
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const { selectedProjectId: contextProjectId, setSelectedProjectId: setContextProjectId } =
     useProject();
   const [projectName, setProjectName] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState<{ id: number; name: string; img?: string } | null>(null);
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
+      setLoading(true);
       try {
         const me = await api.get('/api/me');
+        console.log('User data from /api/me:', me.data);
         setUser(me.data);
-        const userId = me.data.id;
+
+        const userId = me.data?.id;
+        if (!userId || typeof userId !== 'number') {
+          setError("Impossible de récupérer l'ID utilisateur. Êtes-vous bien connecté ?");
+          return;
+        }
 
         const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
         const fetchedProjects = response.data;
@@ -138,8 +145,6 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
             </option>
           ))}
         </select>
-
-        {/* Affichage info utilisateur */}
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold text-white">{user?.id || 'Utilisateur'}</span>
           <img
@@ -149,8 +154,6 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
           />
         </div>
       </div>
-
-      {/* Carousel affichant les composants du projet sélectionné */}
       <Carousel data={components} />
     </div>
   );

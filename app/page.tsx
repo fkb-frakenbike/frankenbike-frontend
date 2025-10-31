@@ -1,8 +1,8 @@
 'use client';
 
-import LoginCheck from './services/LoginCheck';
+import './components/TextLoader/TextLoader.css';
 import TextLoader from './components/TextLoader/TextLoader';
-import '../app/components/TextLoader/TextLoader.css';
+import LoginCheck from './services/LoginCheck';
 
 export default function Home() {
   return (
