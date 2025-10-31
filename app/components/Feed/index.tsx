@@ -3,8 +3,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import FeedList from './FeedList';
 import api from '../../lib/axios';
-import Carousel from '../Carousel';
-import { CardVariant } from '@/app/types';
 
 type Project = {
   id: number;
@@ -30,18 +28,6 @@ const Feed = () => {
 
   const hasMore = total === null || (Array.isArray(projects) && projects.length < total);
 
- const cardsData = projects?.map((project) => ({
-  id: project.id,
-  name: project.title,            // Utilise 'name' ici comme attendu par CardData
-  description: project.description,
-  img: project.imageUrl,
-  likes: 0,                      // Valeur par défaut, ou adapte selon tes données
-  comments: Array.isArray(project.comments) ? project.comments.length : 0,
-  userImg: '',                   // Remplace si tu as une image utilisateur
-  userName: project.user?.email || '',
-  date: project.createdAt,
-  variant: 'purpleCard' as CardVariant,         // Utilise la valeur correspondante au type CardVariant
-}));
 
   const fetchProjects = useCallback(async (pageNum = 1) => {
     try {
