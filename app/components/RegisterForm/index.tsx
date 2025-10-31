@@ -79,7 +79,7 @@ export default function RegisterForm() {
 
   return (
     <div
-      className="fkb-bg flex min-h-screen items-center justify-center"
+      className="fkb-bg flex min-h-screen items-center justify-center pt-28"
       style={{ backgroundSize: '100% 100%', backgroundPosition: '0 0, 0 26%, 0 67%, 0 98%' }}
     >
       <div className="mx-auto my-10 max-w-md rounded-lg bg-transparent p-8">

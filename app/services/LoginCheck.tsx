@@ -12,6 +12,8 @@ export default function LoginCheck() {
       .then(res => {
         if (res.ok) {
           router.push('/feed');
+        } else {
+          router.replace('/login');
         }
       })
       .catch(() => {

@@ -1,0 +1,58 @@
+.text-loader {
+  display: inline-block;
+  color: #2d005e;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  vertical-align: middle;
+}
+
+/* 1) Fondu entier (apparaît / disparaît) */
+@keyframes tl-fade {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.text-loader.fade {
+  animation: tl-fade 2.5s ease-in-out infinite;
+}
+
+/* 2) Révélation gauche->droite */
+@keyframes tl-reveal {
+  0% {
+    --p: 0%;
+  }
+  100% {
+    --p: 100%;
+  }
+}
+.text-loader.reveal {
+  /* Masque standard */
+  mask-image: linear-gradient(90deg, #000 0 var(--p), transparent var(--p) 100%);
+  mask-size: 100% 100%;
+  animation: tl-reveal 1.2s ease-out infinite alternate;
+}
+
+/* Fallback clip-path (si mask non supporté) */
+@supports not (mask-image: linear-gradient(black, white)) {
+  .text-loader.reveal {
+    clip-path: inset(0 calc(100% - var(--p)) 0 0);
+  }
+}
+
+/* Respecte "réduire les animations" */
+@media (prefers-reduced-motion: reduce) {
+  .text-loader.fade,
+  .text-loader.reveal {
+    animation: none;
+    opacity: 1;
+    mask-image: none;
+    clip-path: none;
+  }
+}
