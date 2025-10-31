@@ -37,7 +37,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         console.log('User data from /api/me:', me.data);
         setUser(me.data);
 
-        const userId = me.data?.id;
+        const userId = me.data.user?.id;
         if (!userId || typeof userId !== 'number') {
           setError("Impossible de récupérer l'ID utilisateur. Êtes-vous bien connecté ?");
           return;
