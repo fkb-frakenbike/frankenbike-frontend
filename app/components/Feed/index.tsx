@@ -8,7 +8,7 @@ import { CardVariant } from '@/app/types';
 
 type Project = {
   id: number;
-  user: { email: string };
+  user: { email: string; profile: { photoUrl: string } };
   title: string;
   description: string;
   createdAt: string;

@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 type Project = {
   id: number;
-  user: { email: string };
+  user: { email: string; profile: { photoUrl: string | null } };
   title: string;
   description: string;
   createdAt: string;
@@ -27,6 +27,11 @@ const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
             comments={project.comments.length}
             date={project.updatedAt}
             userName={project.user.email}
+            userImg={
+              project.user.profile.photoUrl && project.user.profile.photoUrl.trim() !== ''
+                ? project.user.profile.photoUrl
+                : '/SvgSite/defaultProfilePic.png'
+            }
             variant="cardcolor"
             likes={0}
           />
