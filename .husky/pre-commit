@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+echo "Build Vercel en cours..."
+npx vercel build
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+  echo "Le build Vercel a échoué. Push annulé."
+  exit 1
+fi
