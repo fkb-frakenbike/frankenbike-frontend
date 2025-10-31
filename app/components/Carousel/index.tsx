@@ -38,7 +38,7 @@ export default function Carousel({ data, vertical = false }: CarouselProps) {
 
   // Si data vide, ne rien afficher
   if (!data || data.length === 0) {
-    return <p className="text-center text-gray-500">Aucune carte à afficher</p>;
+    return <p className="text-center text-gray-500"></p>;
   }
 
   // Calcul des indices visibles avec protection data.length > 0

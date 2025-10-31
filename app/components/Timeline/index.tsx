@@ -19,26 +19,28 @@ type ProjectData = {
 export default function TimelinePage() {
   const router = useRouter();
   const [components, setComponents] = useState<CardData[]>([]);
-  const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [projects, setProjects] = useState<ProjectData[]>([]); // Tableaux initialisés à []
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [projectName, setProjectName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState<{id: number, name: string, img?: string} | null>(null);
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
+      setLoading(true);
       try {
         const me = await api.get('/api/me');
-setUser(me.data);
-const userId = me.data?.id;
+        console.log('User data from /api/me:', me.data);
+        setUser(me.data);
 
-if (!userId || typeof userId !== 'number') {
-  setError("Impossible de récupérer l'ID utilisateur. Êtes-vous bien connecté ?");
-  return;
-}
+        const userId = me.data?.id;
+        if (!userId || typeof userId !== 'number') {
+          setError("Impossible de récupérer l'ID utilisateur. Êtes-vous bien connecté ?");
+          return;
+        }
 
-const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
+        const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
         const fetchedProjects = response.data;
 
         setProjects(fetchedProjects);
@@ -54,6 +56,7 @@ const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
         setSelectedProjectId(firstProject.projectId);
         setProjectName(firstProject.projectName);
         loadComponentsForProject(firstProject);
+
       } catch (err: unknown) {
         if (axios.isAxiosError(err) && err.response?.status === 401) {
           router.push('/login');
@@ -109,11 +112,8 @@ const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2C0857] to-purple-400 p-2 flex flex-col gap-4  pt-12">
-      <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow text-center mt-16 mb-4">
-        Timeline
-      </h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow text-center mt-16 mb-4">Timeline</h1>
       <div className="flex justify-center items-center gap-6 mb-4">
-        {/* Menu déroulant pour sélection du projet */}
         <select
           value={selectedProjectId ?? ""}
           onChange={onProjectChange}
@@ -125,8 +125,6 @@ const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
             </option>
           ))}
         </select>
-
-        {/* Affichage info utilisateur */}
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold text-white">{user?.id || "Utilisateur"}</span>
           <img
@@ -136,8 +134,6 @@ const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
           />
         </div>
       </div>
-
-      {/* Carousel affichant les composants du projet sélectionné */}
       <Carousel data={components} />
     </div>
   );

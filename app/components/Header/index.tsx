@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import LogoutButton from '../LogoutButton';
-import api from '@/app/lib/axios';
+import api from '../../lib/axios';
 import { User } from '@/app/types/user';
 import { BiMenu, BiX } from 'react-icons/bi';
 

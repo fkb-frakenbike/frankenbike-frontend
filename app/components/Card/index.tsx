@@ -158,7 +158,7 @@ export default function CardComponent({
               alt="Like"
               className="w-4 h-4 sm:w-5 sm:h-5"
             />
-            <span className="font-bold text-black text-xs sm:text-base">{likes + (isLiked ? 1 : 0)}</span>
+           {/*  <span className="font-bold text-black text-xs sm:text-base">{likes + (isLiked ? 1 : 0)}</span>*/}
           </button>
           <div className="flex items-center bg-white/90 rounded-full px-2 py-1 sm:px-3 sm:py-1 min-w-[48px] sm:min-w-[70px] gap-1 sm:gap-2">
             <img src="/SvgSite/comment.png" alt="Commentaire" className="w-4 h-4 sm:w-5 sm:h-5" />

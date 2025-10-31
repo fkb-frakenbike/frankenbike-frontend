@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import api from './lib/axios'; // Utilisation de ton instance axios personnalisée
+import api from '../lib/axios'; // Utilisation de ton instance axios personnalisée
 
 type User = {
   id: number;
