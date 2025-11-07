@@ -4,6 +4,7 @@ import { useState } from 'react';
 import InputField from '../InputField/InputField';
 import api from '@/app/lib/axios';
 import { extractErrorMessage } from '@/app/lib/errorMessage';
+import Image from 'next/image';
 
 export default function AddProjectForm() {
   // Etat pour plusieurs fichiers
@@ -102,12 +103,14 @@ export default function AddProjectForm() {
             {selectedImages.length > 0 && (
               <div className="self-center overflow-auto text-white">
                 {selectedImages.map((file, index) => (
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt="Aperçu"
-                    className="mt-2 rounded"
-                    key={index}
-                  />
+                <Image
+                  src={URL.createObjectURL(file)}
+                  alt="Aperçu"
+                  className="mt-2 rounded"
+                  width={500}          // largeur souhaitée (en pixels)
+                  height={300}         // hauteur souhaitée (en pixels)
+                  key={index}
+                />
                 ))}
               </div>
             )}

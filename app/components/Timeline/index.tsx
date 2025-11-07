@@ -1,11 +1,12 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Carousel from '../Carousel';
 import api from '../../lib/axios';
 import axios, { AxiosError } from 'axios';
 import { CardData } from '../../types';
 import { useProject } from '@/app/context/ProjectContext';
+import Image from 'next/image';
 
 interface LoginErrorResponse {
   error: string;
@@ -20,21 +21,38 @@ type ProjectData = {
 export default function TimelinePage({ projectId }: { projectId?: number }) {
   const router = useRouter();
   const [components, setComponents] = useState<CardData[]>([]);
-  const [projects, setProjects] = useState<ProjectData[]>([]); // Tableaux initialisés à []
+  const [projects, setProjects] = useState<ProjectData[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
-  const { selectedProjectId: contextProjectId, setSelectedProjectId: setContextProjectId } =
-    useProject();
+  const { selectedProjectId: contextProjectId, setSelectedProjectId: setContextProjectId } = useProject();
   const [projectName, setProjectName] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState<{ id: number; name: string; img?: string } | null>(null);
+
+  const loadComponentsForProject = useCallback((project: ProjectData) => {
+    const allComponents: CardData[] = project.components.map(component => ({
+      id: component.id,
+      name: component.name,
+      description: component.description,
+      category: component.category,
+      origin: component.origin,
+      variant: 'purpleCard',
+      projectName: projectName,
+      img: component.img?.trim(),
+      likes: component.likes ?? 0,
+      comments: component.comments ?? 0,
+      userImg: component.userImg?.trim(),
+      userName: component.userName ?? '',
+      nature: component.nature ?? '',
+    }));
+    setComponents(allComponents);
+  }, [projectName]);
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
       setLoading(true);
       try {
         const me = await api.get('/api/me');
-        console.log('User data from /api/me:', me.data);
         setUser(me.data);
 
         const userId = me.data.user?.id;
@@ -55,15 +73,12 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
           return;
         }
 
-        // Priorité : prop > contexte > premier projet
         let initialProject = fetchedProjects[0];
         if (typeof projectId === 'number') {
           const found = fetchedProjects.find(project => project.projectId === projectId);
           if (found) initialProject = found;
         } else if (typeof contextProjectId === 'number') {
-          const foundContext = fetchedProjects.find(
-            project => project.projectId === contextProjectId
-          );
+          const foundContext = fetchedProjects.find(project => project.projectId === contextProjectId);
           if (foundContext) initialProject = foundContext;
         }
 
@@ -90,34 +105,14 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
     };
 
     checkAuthAndFetch();
-  }, [router]);
-
-  function loadComponentsForProject(project: ProjectData) {
-    const allComponents: CardData[] = project.components.map(component => ({
-      id: component.id,
-      name: component.name,
-      description: component.description,
-      category: component.category,
-      origin: component.origin,
-      variant: 'purpleCard',
-      projectName: projectName,
-      img: component.img?.trim(),
-      likes: component.likes ?? 0,
-      comments: component.comments ?? 0,
-      userImg: component.userImg?.trim(),
-      userName: component.userName ?? '',
-      nature: component.nature ?? '',
-    }));
-    setComponents(allComponents);
-  }
-
-  console.log('components', components);
+  }, [router, contextProjectId, loadComponentsForProject, projectId, setContextProjectId]);
+  
 
   function onProjectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const projectId = Number(event.target.value);
-    setSelectedProjectId(projectId);
-    setContextProjectId(projectId);
-    const project = projects.find(p => p.projectId === projectId);
+    const pid = Number(event.target.value);
+    setSelectedProjectId(pid);
+    setContextProjectId(pid);
+    const project = projects.find(p => p.projectId === pid);
     if (project) {
       setProjectName(project.projectName);
       loadComponentsForProject(project);
@@ -133,7 +128,6 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         Timeline
       </h1>
       <div className="mb-4 flex items-center justify-center gap-6">
-        {/* Menu déroulant pour sélection du projet */}
         <select
           value={selectedProjectId ?? ''}
           onChange={onProjectChange}
@@ -147,10 +141,12 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         </select>
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold text-white">{user?.id || 'Utilisateur'}</span>
-          <img
-            src={user?.img || 'SvgSite/profile.png'}
+          <Image
+            src={user?.img && user.img.trim() !== '' ? user.img : '/SvgSite/defaultProfilePic.png'}
             alt="Profil"
-            className="h-8 w-8 rounded-full border-2 border-white object-cover sm:h-10 sm:w-10 md:h-12 md:w-12"
+            width={48}
+            height={48}
+            className="rounded-full border-2 border-white object-cover sm:h-10 sm:w-10 md:h-12 md:w-12"
           />
         </div>
       </div>
