@@ -3,125 +3,73 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Carousel from '../Carousel';
 import api from '../../lib/axios';
-import axios, { AxiosError } from 'axios';
 import { CardData } from '../../types';
 import { useProject } from '@/app/context/ProjectContext';
-
-interface LoginErrorResponse {
-  error: string;
-}
+import axios, { AxiosError } from 'axios';
 
 type ProjectData = {
-  projectId: number;
-  projectName: string;
+  id: number;
+  title: string;
   components: CardData[];
 };
 
+interface ComponentsFetchErrorResponse {
+  error: string;
+}
+
 export default function TimelinePage({ projectId }: { projectId?: number }) {
   const router = useRouter();
+  const [projects, setProjects] = useState<ProjectData[]>([]);
   const [components, setComponents] = useState<CardData[]>([]);
-  const [projects, setProjects] = useState<ProjectData[]>([]); // Tableaux initialisés à []
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
-  const { selectedProjectId: contextProjectId, setSelectedProjectId: setContextProjectId } =
-    useProject();
-  const [projectName, setProjectName] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | ''>(projectId ?? '');
   const [loading, setLoading] = useState<boolean>(true);
-  const [user, setUser] = useState<{ id: number; name: string; img?: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { setSelectedProjectId: setContextProjectId } = useProject();
 
   useEffect(() => {
-    const checkAuthAndFetch = async () => {
+    const fetchProjects = async () => {
       setLoading(true);
       try {
-        const me = await api.get('/api/me');
-        console.log('User data from /api/me:', me.data);
-        setUser(me.data);
+        const res = await api.get('/api/me');
+        const userProjects: ProjectData[] = res.data.projects || [];
+        setProjects(userProjects);
 
-        const userId = me.data.user?.id;
-        if (!userId || typeof userId !== 'number') {
-          setError("Impossible de récupérer l'ID utilisateur. Êtes-vous bien connecté ?");
-          return;
-        }
-
-        const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
-        const fetchedProjects = response.data;
-
-        setProjects(fetchedProjects);
-
-        if (fetchedProjects.length === 0) {
-          setProjectName('Projet sans nom');
-          setComponents([]);
-          setSelectedProjectId(null);
-          return;
-        }
-
-        // Priorité : prop > contexte > premier projet
-        let initialProject = fetchedProjects[0];
+        // Détermine le projet sélectionné
+        let initialId: number | '' = '';
         if (typeof projectId === 'number') {
-          const found = fetchedProjects.find(project => project.projectId === projectId);
-          if (found) initialProject = found;
-        } else if (typeof contextProjectId === 'number') {
-          const foundContext = fetchedProjects.find(
-            project => project.projectId === contextProjectId
-          );
-          if (foundContext) initialProject = foundContext;
+          initialId = userProjects.find(p => p.id === projectId)?.id ?? '';
+        } else if (userProjects.length > 0) {
+          initialId = userProjects[0].id;
         }
+        setSelectedProjectId(initialId);
+        setContextProjectId(initialId);
 
-        setSelectedProjectId(initialProject.projectId);
-        setProjectName(initialProject.projectName);
-        setContextProjectId(initialProject.projectId);
-        loadComponentsForProject(initialProject);
+        // Charge les composants du projet sélectionné
+        const selectedProject = userProjects.find(p => p.id === initialId);
+        setComponents(selectedProject?.components ?? []);
       } catch (err: unknown) {
-        if (axios.isAxiosError(err) && err.response?.status === 401) {
-          router.push('/login');
+        if (axios.isAxiosError(err)) {
+          const apiError = err as AxiosError<ComponentsFetchErrorResponse>;
+          setError(apiError.response?.data?.error || apiError.message || 'unknown error');
+        } else if (err instanceof Error) {
+          setError(err.message);
         } else {
-          if (axios.isAxiosError<LoginErrorResponse>(err)) {
-            const apiError = err as AxiosError<LoginErrorResponse>;
-            setError(apiError.response?.data?.error || apiError.message || 'Erreur inconnue');
-          } else if (err instanceof Error) {
-            setError(err.message);
-          } else {
-            setError('Erreur inconnue lors du chargement de la timeline');
-          }
+          setError('Erreur lors du chargement des projets.');
         }
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuthAndFetch();
-  }, [router]);
-
-  function loadComponentsForProject(project: ProjectData) {
-    const allComponents: CardData[] = project.components.map(component => ({
-      id: component.id,
-      name: component.name,
-      description: component.description,
-      category: component.category,
-      origin: component.origin,
-      variant: 'purpleCard',
-      projectName: projectName,
-      img: component.img?.trim(),
-      likes: component.likes ?? 0,
-      comments: component.comments ?? 0,
-      userImg: component.userImg?.trim(),
-      userName: component.userName ?? '',
-      nature: component.nature ?? '',
-    }));
-    setComponents(allComponents);
-  }
-
-  console.log('components', components);
+    fetchProjects();
+  }, [projectId, setContextProjectId]);
 
   function onProjectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const projectId = Number(event.target.value);
-    setSelectedProjectId(projectId);
-    setContextProjectId(projectId);
-    const project = projects.find(p => p.projectId === projectId);
-    if (project) {
-      setProjectName(project.projectName);
-      loadComponentsForProject(project);
-    }
+    const id = Number(event.target.value);
+    setSelectedProjectId(id);
+    setContextProjectId(id);
+    const project = projects.find(p => p.id === id);
+    setComponents(project?.components ?? []);
   }
 
   if (loading) return <p>Chargement...</p>;
@@ -133,26 +81,17 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         Timeline
       </h1>
       <div className="mb-4 flex items-center justify-center gap-6">
-        {/* Menu déroulant pour sélection du projet */}
         <select
-          value={selectedProjectId ?? ''}
+          value={selectedProjectId}
           onChange={onProjectChange}
           className="rounded p-2 text-black"
         >
           {projects.map(project => (
-            <option key={project.projectId} value={project.projectId}>
-              {project.projectName}
+            <option key={project.id} value={project.id}>
+              {project.title}
             </option>
           ))}
         </select>
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-white">{user?.id || 'Utilisateur'}</span>
-          <img
-            src={user?.img || 'SvgSite/profile.png'}
-            alt="Profil"
-            className="h-8 w-8 rounded-full border-2 border-white object-cover sm:h-10 sm:w-10 md:h-12 md:w-12"
-          />
-        </div>
       </div>
       <Carousel data={components} />
     </div>

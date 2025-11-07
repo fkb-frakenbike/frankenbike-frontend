@@ -19,22 +19,24 @@ const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
     <div className="grid min-h-full grid-cols-1 justify-items-center gap-6">
       {Array.isArray(projects) && projects.length > 0 ? (
         projects.map(project => (
-          <CardComponent
-            key={project.id}
-            name={project.title}
-            description={project.description}
-            img={project.imageUrl}
-            comments={project.comments.length}
-            date={project.updatedAt}
-            userName={project.user.email}
-            userImg={
-              project.user.profile.photoUrl && project.user.profile.photoUrl.trim() !== ''
-                ? project.user.profile.photoUrl
-                : '/SvgSite/defaultProfilePic.png'
-            }
-            variant="cardcolor"
-            likes={0}
-          />
+          <Link key={project.id} href={`/timeline?projectId=${project.id}`}>
+            <CardComponent
+              key={project.id}
+              name={project.title}
+              description={project.description}
+              img={project.imageUrl}
+              comments={project.comments.length}
+              date={project.updatedAt}
+              userName={project.user.email}
+              userImg={
+                project.user.profile.photoUrl && project.user.profile.photoUrl.trim() !== ''
+                  ? project.user.profile.photoUrl
+                  : '/SvgSite/defaultProfilePic.png'
+              }
+              variant="cardcolor"
+              likes={0}
+            />
+          </Link>
         ))
       ) : (
         <div className="flex flex-col items-center gap-6 py-12">
