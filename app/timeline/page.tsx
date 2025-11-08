@@ -1,5 +1,3 @@
-'use client';
-
 import Timeline from '../components/Timeline';
 
 export default async function TimelinePage({ searchParams }: PageProps<'/timeline'>) {

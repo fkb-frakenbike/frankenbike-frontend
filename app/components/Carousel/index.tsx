@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Card from '../Card';
-import { CardData } from '../../types';
+import { CardData } from '../../types/card';
 
 type CarouselProps = {
   data: CardData[];

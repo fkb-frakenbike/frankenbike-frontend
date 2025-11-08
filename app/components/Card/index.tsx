@@ -1,22 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Next.js 13+
-import { CardVariant } from '../../types';
+import { CardData } from '../../types/card';
 
-type CardProps = {
-  id?: string | number;
-  variant: CardVariant;
-  name: string;
-  description: string;
-  img?: string;
-  likes: number;
-  comments: number;
+type CardProps = CardData & {
   className?: string;
-  color?: string;
-  userImg?: string;
-  userName?: string;
-  nature?: string;
-  date?: string | Date;
 };
 
 const RANDOM_COLORS = [
@@ -103,7 +91,11 @@ export default function CardComponent({
       <div
         className={`relative w-full ${variant === 'cardcolor' ? 'mt-4' : 'mt-0'} ${variant === 'cardcolor' ? 'h-28 sm:h-36 md:h-40' : 'h-32 sm:h-40 md:h-48'} ${variant === 'purpleCard' ? 'px-3 sm:px-4 md:px-6' : ''} `}
       >
-        <img src={img} alt={name} className="h-full w-full rounded-[30px] object-cover" />
+        <img
+          src={img ? img : '/public/SvgSite/defaultProfilePicture.png'}
+          alt={name}
+          className="h-full w-full rounded-[30px] object-cover"
+        />
       </div>
 
       {/* Contenu */}

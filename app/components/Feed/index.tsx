@@ -3,18 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import FeedList from './FeedList';
 import api from '../../lib/axios';
-
-type Project = {
-  id: number;
-  user: { email: string; profile: { photoUrl: string } };
-  title: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  imageUrl: string;
-  comments: unknown[];
-  components: unknown[];
-};
+import { Project } from '@/app/types/projects';
 
 const PAGE_SIZE = 10;
 
