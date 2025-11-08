@@ -36,7 +36,7 @@ const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
             Soyez le premier à ajouter le vôtre !
           </p>
           <Link
-            href="/addProject"
+            href="/add-project"
             title="Ajouter un projet"
             className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2d005e] px-6 py-2 text-white shadow transition hover:bg-[#6c3cff]"
           >

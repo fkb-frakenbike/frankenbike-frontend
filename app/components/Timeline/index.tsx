@@ -1,4 +1,5 @@
 'use client';
+import '../../components/TextLoader/TextLoader.css';
 import React, { useEffect, useState } from 'react';
 import Carousel from '../Carousel';
 import api from '../../lib/axios';
@@ -6,6 +7,9 @@ import { mapApiComponentToCardData } from '../../types/card';
 import { useProject } from '@/app/context/ProjectContext';
 import axios, { AxiosError } from 'axios';
 import { Component } from '@/app/types/component';
+import Link from 'next/link';
+import { useAuth } from '@/app/context/AuthContext';
+import TextLoader from '../TextLoader/TextLoader';
 
 type ProjectData = {
   id: number;
@@ -30,6 +34,9 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { setSelectedProjectId: setContextProjectId } = useProject();
+  const { auth, loading: authLoading } = useAuth();
+
+  console.log('authenticated user in TimelinePage:', auth);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -82,12 +89,23 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
     setContextProjectId(id);
   }
 
-  if (loading) return <p>Chargement...</p>;
+  if (loading || authLoading)
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <TextLoader text="FKB" className="fade font-main text-6xl" />
+      </div>
+    );
   if (error) return <p className="text-center text-red-300">{error}</p>;
 
   // Récupère les composants du projet sélectionné
-  const selectedProject = projects.find(p => p.id === selectedProjectId);
+  const selectedProject = projects.find(project => project.id === selectedProjectId);
   const mappedComponents = (selectedProject?.components || []).map(mapApiComponentToCardData);
+  console.log('selectedProject:', selectedProject);
+  const isOwner =
+    auth?.user &&
+    selectedProject &&
+    selectedProject.user &&
+    String(auth?.user.id) === String(selectedProject.user.id);
 
   return (
     <div className="flex min-h-screen flex-col gap-4 bg-gradient-to-br from-[#2C0857] to-purple-400 p-2 pt-12">
@@ -108,6 +126,16 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         </select>
       </div>
       <Carousel data={mappedComponents} />
+      {/* Bouton flottant en bas à droite */}
+      {isOwner && (
+        <Link
+          href={`/add-component?projectId=${selectedProjectId}`}
+          title="Ajouter un composant"
+          className="fixed bottom-8 right-8 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-[#2d005e] px-6 py-2 text-white shadow transition hover:bg-[#6c3cff]"
+        >
+          <span className="text-6xl leading-none">+</span>
+        </Link>
+      )}
     </div>
   );
 }
