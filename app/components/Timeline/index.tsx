@@ -1,26 +1,31 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Carousel from '../Carousel';
 import api from '../../lib/axios';
-import { CardData } from '../../types';
+import { mapApiComponentToCardData } from '../../types/card';
 import { useProject } from '@/app/context/ProjectContext';
 import axios, { AxiosError } from 'axios';
+import { Component } from '@/app/types/component';
 
 type ProjectData = {
   id: number;
   title: string;
-  components: CardData[];
+  components: Component[];
+  user: { id: number; email: string };
 };
+
+interface ProjectApiResponse {
+  id: number;
+  title: string;
+  user: { id: number };
+}
 
 interface ComponentsFetchErrorResponse {
   error: string;
 }
 
 export default function TimelinePage({ projectId }: { projectId?: number }) {
-  const router = useRouter();
   const [projects, setProjects] = useState<ProjectData[]>([]);
-  const [components, setComponents] = useState<CardData[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<number | ''>(projectId ?? '');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,23 +35,30 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const res = await api.get('/api/me');
-        const userProjects: ProjectData[] = res.data.projects || [];
-        setProjects(userProjects);
+        let userProjects: ProjectData[] = [];
+        let initialProjectId: number | '' = '';
 
-        // Détermine le projet sélectionné
-        let initialId: number | '' = '';
         if (typeof projectId === 'number') {
-          initialId = userProjects.find(p => p.id === projectId)?.id ?? '';
-        } else if (userProjects.length > 0) {
-          initialId = userProjects[0].id;
-        }
-        setSelectedProjectId(initialId);
-        setContextProjectId(initialId);
+          const projectRes = await api.get<ProjectApiResponse>(`/api/projects/${projectId}`);
+          const userId = projectRes.data.user.id;
+          const userProjectsRes = await api.get<{ data: ProjectData[] }>(
+            `/api/users/${userId}/projects`
+          );
+          userProjects = userProjectsRes.data.data || [];
+          setProjects(userProjects);
 
-        // Charge les composants du projet sélectionné
-        const selectedProject = userProjects.find(p => p.id === initialId);
-        setComponents(selectedProject?.components ?? []);
+          initialProjectId =
+            userProjects.find(userProject => userProject.id === projectId)?.id ??
+            userProjects[0]?.id ??
+            '';
+        } else {
+          const res = await api.get<{ projects: ProjectData[] }>('/api/me');
+          userProjects = res.data.projects || [];
+          setProjects(userProjects);
+          initialProjectId = userProjects[0]?.id ?? '';
+        }
+        setSelectedProjectId(initialProjectId);
+        setContextProjectId(initialProjectId);
       } catch (err: unknown) {
         if (axios.isAxiosError(err)) {
           const apiError = err as AxiosError<ComponentsFetchErrorResponse>;
@@ -68,12 +80,14 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
     const id = Number(event.target.value);
     setSelectedProjectId(id);
     setContextProjectId(id);
-    const project = projects.find(p => p.id === id);
-    setComponents(project?.components ?? []);
   }
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p className="text-center text-red-300">{error}</p>;
+
+  // Récupère les composants du projet sélectionné
+  const selectedProject = projects.find(p => p.id === selectedProjectId);
+  const mappedComponents = (selectedProject?.components || []).map(mapApiComponentToCardData);
 
   return (
     <div className="flex min-h-screen flex-col gap-4 bg-gradient-to-br from-[#2C0857] to-purple-400 p-2 pt-12">
@@ -93,7 +107,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
           ))}
         </select>
       </div>
-      <Carousel data={components} />
+      <Carousel data={mappedComponents} />
     </div>
   );
 }

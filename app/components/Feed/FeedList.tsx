@@ -1,20 +1,10 @@
 import React from 'react';
 import CardComponent from '../Card';
 import Link from 'next/link';
-
-type Project = {
-  id: number;
-  user: { email: string; profile: { photoUrl: string | null } };
-  title: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  imageUrl: string;
-  comments: unknown[];
-  components: unknown[];
-};
+import { Project } from '@/app/types/projects';
 
 const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
+  console.log('FeedList projects:', projects);
   return (
     <div className="grid min-h-full grid-cols-1 justify-items-center gap-6">
       {Array.isArray(projects) && projects.length > 0 ? (
