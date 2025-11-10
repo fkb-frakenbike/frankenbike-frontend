@@ -132,8 +132,7 @@ export default function CardComponent({
         <Image
           src={safeImg}
           alt={safeAlt}
-          width={576}
-          height={320}
+          fill
           className="object-cover rounded-[30px]"
         />
       </div>

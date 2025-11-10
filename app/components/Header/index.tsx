@@ -80,10 +80,10 @@ const Header: React.FC = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`rounded-md px-3 py-2 text-lg transition-colors ${
+                  className={`rounded-md px-3 py-2 text-lg transition-colors  ${
                     isWhite
-                      ? 'text-white hover:text-gray-300'
-                      : 'text-[#2d005e] hover:text-gray-50'
+                      ? 'text-white'
+                      : 'text-[#2d005e]'
                   } ${pathname === link.href ? 'font-bold' : ''}`}
                 >
                   {link.label}

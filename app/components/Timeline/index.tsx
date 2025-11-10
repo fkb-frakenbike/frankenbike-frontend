@@ -121,7 +121,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <p className="text-center text-red-300">{error}</p>;
-
+console.log('Utilisateur', user?.id);
   return (
     <div className="flex min-h-screen flex-col gap-4 bg-gradient-to-br from-[#2C0857] to-purple-400 p-2 pt-12">
       <h1 className="mb-4 mt-16 text-center text-2xl font-bold text-white drop-shadow md:text-3xl">
@@ -141,6 +141,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         </select>
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold text-white">{user?.id || 'Utilisateur'}</span>
+          
           <Image
             src={user?.img && user.img.trim() !== '' ? user.img : '/SvgSite/defaultProfilePic.png'}
             alt="Profil"
