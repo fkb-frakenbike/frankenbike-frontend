@@ -17,7 +17,7 @@ const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
               img={project.imageUrl}
               comments={project.comments.length}
               date={project.updatedAt}
-              userName={project.user.email}
+              userName={project.user.profile.firstName || 'Utilisateur'}
               userImg={
                 project.user.profile.photoUrl && project.user.profile.photoUrl.trim() !== ''
                   ? project.user.profile.photoUrl
