@@ -16,7 +16,7 @@ type ProjectData = {
   id: number;
   title: string;
   components: Component[];
-  user: { id: number; email: string; profile: { photoUrl: string | null } };
+  user: { id: number; email: string; profile: { firstName: string; photoUrl: string | null } };
 };
 
 interface ProjectApiResponse {
@@ -127,7 +127,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
           ))}
         </select>
         <span className="text-xl font-bold text-white">
-          {selectedProject?.user?.id || 'Utilisateur'}
+          {selectedProject?.user?.profile?.firstName || 'Utilisateur'}
         </span>
         <Image
           src={
