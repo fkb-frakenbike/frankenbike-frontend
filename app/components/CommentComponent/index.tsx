@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 type Comment = {
   id: number;
   name: string;
@@ -29,7 +31,7 @@ export default function CommentBox() {
           className="flex items-start gap-3 bg-white bg-opacity-10 rounded-lg p-3 mb-3"
         >
           {/* Avatar */}
-          <img
+          <Image
             src={comment.avatarUrl}
             alt={comment.name}
             className="w-10 h-10 rounded-full object-cover"
@@ -46,7 +48,7 @@ export default function CommentBox() {
 
           {/* Like */}
           <div className="flex flex-col items-center ml-2 mt-1">
-            <img
+            <Image
               src={"/SvgSite/like.png"}
               alt="Like"
               className="w-4 h-4 sm:w-5 sm:h-5 mb-1"

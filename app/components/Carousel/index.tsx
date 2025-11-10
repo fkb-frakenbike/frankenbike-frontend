@@ -138,7 +138,6 @@ export default function Carousel({ data, vertical = false }: CarouselProps) {
           );
         })}
       </motion.div>
-
       {/* Bouton suivant */}
       <button
         onClick={handleNext}
@@ -157,7 +156,6 @@ export default function Carousel({ data, vertical = false }: CarouselProps) {
           />
         </svg>
       </button>
-
       {/* Informations */}
       <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 text-center text-sm text-gray-500">
         {vertical ? (

@@ -25,7 +25,7 @@ export default function ComponentDetailsWrapper({ id }: Props) {
       try {
         const res = await api.get(`/api/components/${id}`);
         setComponent({
-          img: res.data.photoS3Key || '/defaultImage.png',
+          img: res.data.photoS3Key || '/bikeCustom.png',
           title: res.data.name,
           text: res.data.description,
           comment: 'Commentaire statique pour l’instant',

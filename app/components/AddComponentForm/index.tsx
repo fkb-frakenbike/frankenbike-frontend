@@ -6,6 +6,7 @@ import api from '../../lib/axios';
 import { Project } from '@/app/types/projects';
 import { useRouter } from 'next/navigation';
 import { useProject } from '@/app/context/ProjectContext';
+import Image from 'next/image';
 
 const ORIGIN_OPTIONS = [
   { value: 'homemade', label: 'Fait maison' },
@@ -235,7 +236,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
 
             {selectedImage && (
               <div className="self-center overflow-auto text-white">
-                <img
+                <Image
                   src={URL.createObjectURL(selectedImage)}
                   alt="Aperçu"
                   className="mt-2 rounded"

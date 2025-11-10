@@ -10,12 +10,13 @@ import { Component } from '@/app/types/component';
 import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
 import TextLoader from '../TextLoader/TextLoader';
+import Image from 'next/image';
 
 type ProjectData = {
   id: number;
   title: string;
   components: Component[];
-  user: { id: number; email: string };
+  user: { id: number; email: string; profile: { photoUrl: string | null } };
 };
 
 interface ProjectApiResponse {
@@ -47,6 +48,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
 
         if (typeof projectId === 'number') {
           const projectRes = await api.get<ProjectApiResponse>(`/api/projects/${projectId}`);
+          console.log('fetched project:', projectRes.data);
           const userId = projectRes.data.user.id;
           const userProjectsRes = await api.get<{ data: ProjectData[] }>(
             `/api/users/${userId}/projects`
@@ -124,6 +126,21 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
             </option>
           ))}
         </select>
+        <span className="text-xl font-bold text-white">
+          {selectedProject?.user?.id || 'Utilisateur'}
+        </span>
+        <Image
+          src={
+            selectedProject?.user?.profile?.photoUrl &&
+            selectedProject?.user?.profile?.photoUrl.trim() !== ''
+              ? selectedProject?.user?.profile?.photoUrl
+              : '/SvgSite/defaultProfilePic.png'
+          }
+          alt="Profil"
+          width={48}
+          height={48}
+          className="rounded-full border-2 border-white object-cover sm:h-10 sm:w-10 md:h-12 md:w-12"
+        />
       </div>
       <Carousel data={mappedComponents} />
       {/* Bouton flottant en bas à droite */}
