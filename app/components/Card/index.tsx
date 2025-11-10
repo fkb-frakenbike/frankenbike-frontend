@@ -105,7 +105,12 @@ export default function CardComponent({
       <div
         className={`relative w-full ${variant === 'cardcolor' ? 'mt-4' : 'mt-0'} ${variant === 'cardcolor' ? 'h-28 sm:h-36 md:h-40' : 'h-32 sm:h-40 md:h-48'} ${variant === 'purpleCard' ? 'px-3 sm:px-4 md:px-6' : ''} `}
       >
-        <Image src={safeImg} alt={safeAlt} fill className="rounded-[30px] object-cover" />
+        <Image
+          src={safeImg}
+          alt={safeAlt}
+          fill
+          className="object-cover rounded-[30px]"
+        />
       </div>
 
       <div className="flex flex-1 flex-col px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6">
