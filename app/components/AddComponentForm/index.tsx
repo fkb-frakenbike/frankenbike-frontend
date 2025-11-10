@@ -239,6 +239,8 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
                 <Image
                   src={URL.createObjectURL(selectedImage)}
                   alt="Aperçu"
+                  width={500}          // largeur souhaitée (en pixels)
+                  height={300}         // hauteur souhaitée (en pixels)
                   className="mt-2 rounded"
                 />
               </div>

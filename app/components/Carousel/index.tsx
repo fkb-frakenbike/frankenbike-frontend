@@ -10,8 +10,9 @@ type CarouselProps = {
   vertical?: boolean;
 };
 
-function useCardsToShow() {
-  const [cardsToShow, setCardsToShow] = useState(1);
+function useCardsToShow(cardNumber: number) {
+  const [cardsToShow, setCardsToShow] = useState(cardNumber || 1);
+
 
   useEffect(() => {
     function handleResize() {
@@ -32,34 +33,43 @@ function useCardsToShow() {
   return cardsToShow;
 }
 
+function getVisibleIndices(active: number, total: number, cardsToDisplay: number) {
+  const indices = [];
+  for (let i = 0; i < cardsToDisplay; i++) {
+    indices.push((active + i) % total);
+  }
+  return indices;
+}
+
+
 export default function Carousel({ data, vertical = false }: CarouselProps) {
-  const [active, setActive] = useState(0);
-  const cardsToShow = useCardsToShow();
+   const [active, setActive] = useState(0);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const cardsToShow = useCardsToShow(data.length);
 
   // Si data vide, ne rien afficher
   if (!data || data.length === 0) {
     return <p className="text-center text-gray-500"></p>;
   }
 
-  // Calcul des indices visibles avec protection data.length > 0
-  const getVisibleIndices = () => {
-    const n = cardsToShow;
-    const indices = [];
-    for (let i = 0; i < n; i++) {
-      const idx = (active + i) % data.length;
-      indices.push(idx);
-    }
-    return indices;
-  };
 
-  const handlePrev = () => setActive(prev => (prev - 1 + data.length) % data.length);
-  const handleNext = () => setActive(prev => (prev + 1) % data.length);
+ const handlePrev = () => {
+    setActive(prev => (prev - 1 + data.length) % data.length);
+    setSwipeDirection('right');
+  };
+  const handleNext = () => {
+    setActive(prev => (prev + 1) % data.length);
+    setSwipeDirection('left');
+  };
 
   const dragDirection = vertical ? "y" : "x";
   const dragConstraints = vertical ? { top: 0, bottom: 0 } : { left: 0, right: 0 };
   const swipeThreshold = 50;
 
-  const visibleIndices = getVisibleIndices();
+  const cardsToDisplay = Math.min(cardsToShow, data.length);
+  const visibleIndices = getVisibleIndices(active, data.length, cardsToDisplay);
+
+
 
   return (
     <div className={`relative w-full flex items-center justify-center min-h-[480px] py-8`}>
@@ -95,10 +105,17 @@ export default function Carousel({ data, vertical = false }: CarouselProps) {
           else if (offset < -swipeThreshold) handleNext();
         }}
       >
-        {visibleIndices.map((idx, i) => {
-          const card = data[idx];
+         {visibleIndices.map(i => {
+          const card = data[i];
           if (!card) return null;
-          const isActive = idx === active;
+          const isActive = i === active;
+
+          let marginClass = '';
+          if (swipeDirection === 'left') {
+            marginClass = '-ml-8 md:-ml-12 lg:-ml-20';
+          } else if (swipeDirection === 'right') {
+            marginClass = '-mr-8 md:-mr-12 lg:-mr-20';
+          }
           return (
             <motion.div
               key={`${card.id}-${i}`}
