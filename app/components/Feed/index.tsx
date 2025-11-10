@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import FeedList from './FeedList';
 import api from '../../lib/axios';
 
-
 type Project = {
   id: number;
   user: { email: string; profile: { photoUrl: string } };
@@ -28,8 +27,6 @@ const Feed = () => {
   const [total, setTotal] = useState<number | null>(null);
 
   const hasMore = total === null || (Array.isArray(projects) && projects.length < total);
-
-
 
   const fetchProjects = useCallback(async (pageNum = 1) => {
     try {
@@ -87,8 +84,6 @@ const Feed = () => {
         <FeedList projects={projects} />
       )}
       {loadingMore && <div className="py-4 text-center text-gray-500">Chargement…</div>}
-    
-
     </div>
   );
 };
