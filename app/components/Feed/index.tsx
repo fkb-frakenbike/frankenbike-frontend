@@ -1,20 +1,12 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+import '../../components/TextLoader/TextLoader.css';
 import FeedList from './FeedList';
 import api from '../../lib/axios';
-
-type Project = {
-  id: number;
-  user: { email: string; profile: { photoUrl: string } };
-  title: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  imageUrl: string;
-  comments: unknown[];
-  components: unknown[];
-};
+import { Project } from '@/app/types/projects';
+import TextLoader from '../TextLoader/TextLoader';
+import Link from 'next/link';
 
 const PAGE_SIZE = 10;
 
@@ -77,11 +69,22 @@ const Feed = () => {
     <div className="min-h-screen">
       {/* <h2 className="mb-4 text-2xl font-semibold text-gray-800">Feed</h2> */}
       {loading ? (
-        <div className="text-gray-500">Loading…</div>
+        <div className="flex min-h-screen items-center justify-center">
+          <TextLoader text="FKB" className="fade font-main text-6xl" />
+        </div>
       ) : error ? (
         <div className="mb-4 text-red-600">{error}</div>
       ) : (
-        <FeedList projects={projects} />
+        <>
+          <FeedList projects={projects} />
+          <Link
+            href="/add-project"
+            title="Créer un projet"
+            className="fixed bottom-8 right-8 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-[#2d005e] px-6 py-2 text-white shadow transition hover:bg-[#6c3cff]"
+          >
+            <span className="text-6xl leading-none">+</span>
+          </Link>
+        </>
       )}
       {loadingMore && <div className="py-4 text-center text-gray-500">Chargement…</div>}
     </div>

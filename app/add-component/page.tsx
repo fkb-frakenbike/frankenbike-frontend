@@ -1,6 +1,6 @@
 import AddComponentForm from '../components/AddComponentForm';
 
-export default async function AddComponentPage({ searchParams }: PageProps<'/addComponent'>) {
+export default async function AddComponentPage({ searchParams }: PageProps<'/add-component'>) {
   const params = searchParams ? await searchParams : {};
   const projectId = params?.projectId ? Number(params.projectId) : undefined;
   return (

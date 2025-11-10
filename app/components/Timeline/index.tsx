@@ -1,126 +1,113 @@
 'use client';
-import React, { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import '../../components/TextLoader/TextLoader.css';
+import React, { useEffect, useState } from 'react';
 import Carousel from '../Carousel';
 import api from '../../lib/axios';
-import axios, { AxiosError } from 'axios';
-import { CardData } from '../../types';
+import { mapApiComponentToCardData } from '../../types/card';
 import { useProject } from '@/app/context/ProjectContext';
+import axios, { AxiosError } from 'axios';
+import { Component } from '@/app/types/component';
+import Link from 'next/link';
+import { useAuth } from '@/app/context/AuthContext';
+import TextLoader from '../TextLoader/TextLoader';
 import Image from 'next/image';
 
-interface LoginErrorResponse {
+type ProjectData = {
+  id: number;
+  title: string;
+  components: Component[];
+  user: { id: number; email: string; profile: { photoUrl: string | null } };
+};
+
+interface ProjectApiResponse {
+  id: number;
+  title: string;
+  user: { id: number };
+}
+
+interface ComponentsFetchErrorResponse {
   error: string;
 }
 
-type ProjectData = {
-  projectId: number;
-  projectName: string;
-  components: CardData[];
-};
-
 export default function TimelinePage({ projectId }: { projectId?: number }) {
-  const router = useRouter();
-  const [components, setComponents] = useState<CardData[]>([]);
   const [projects, setProjects] = useState<ProjectData[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
-  const { selectedProjectId: contextProjectId, setSelectedProjectId: setContextProjectId } = useProject();
-  const [projectName, setProjectName] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | ''>(projectId ?? '');
   const [loading, setLoading] = useState<boolean>(true);
-  const [user, setUser] = useState<{ id: number; name: string; img?: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { setSelectedProjectId: setContextProjectId } = useProject();
+  const { auth, loading: authLoading } = useAuth();
 
-  const loadComponentsForProject = useCallback((project: ProjectData) => {
-    const allComponents: CardData[] = project.components.map(component => ({
-      id: component.id,
-      name: component.name,
-      description: component.description,
-      category: component.category,
-      origin: component.origin,
-      variant: 'purpleCard',
-      projectName: projectName,
-      img: component.img?.trim(),
-      likes: component.likes ?? 0,
-      comments: component.comments ?? 0,
-      userImg: component.userImg?.trim(),
-      userName: component.userName ?? '',
-      nature: component.nature ?? '',
-    }));
-    setComponents(allComponents);
-  }, [projectName]);
+  console.log('authenticated user in TimelinePage:', auth);
 
   useEffect(() => {
-    const checkAuthAndFetch = async () => {
+    const fetchProjects = async () => {
       setLoading(true);
       try {
-        const me = await api.get('/api/me');
-        setUser(me.data);
+        let userProjects: ProjectData[] = [];
+        let initialProjectId: number | '' = '';
 
-        const userId = me.data.user?.id;
-        if (!userId || typeof userId !== 'number') {
-          setError("Impossible de récupérer l'ID utilisateur. Êtes-vous bien connecté ?");
-          return;
-        }
-
-        const response = await api.get<ProjectData[]>(`/api/timelines/${userId}`);
-        const fetchedProjects = response.data;
-
-        setProjects(fetchedProjects);
-
-        if (fetchedProjects.length === 0) {
-          setProjectName('Projet sans nom');
-          setComponents([]);
-          setSelectedProjectId(null);
-          return;
-        }
-
-        let initialProject = fetchedProjects[0];
         if (typeof projectId === 'number') {
-          const found = fetchedProjects.find(project => project.projectId === projectId);
-          if (found) initialProject = found;
-        } else if (typeof contextProjectId === 'number') {
-          const foundContext = fetchedProjects.find(project => project.projectId === contextProjectId);
-          if (foundContext) initialProject = foundContext;
-        }
+          const projectRes = await api.get<ProjectApiResponse>(`/api/projects/${projectId}`);
+          console.log('fetched project:', projectRes.data);
+          const userId = projectRes.data.user.id;
+          const userProjectsRes = await api.get<{ data: ProjectData[] }>(
+            `/api/users/${userId}/projects`
+          );
+          userProjects = userProjectsRes.data.data || [];
+          setProjects(userProjects);
 
-        setSelectedProjectId(initialProject.projectId);
-        setProjectName(initialProject.projectName);
-        setContextProjectId(initialProject.projectId);
-        loadComponentsForProject(initialProject);
-      } catch (err: unknown) {
-        if (axios.isAxiosError(err) && err.response?.status === 401) {
-          router.push('/login');
+          initialProjectId =
+            userProjects.find(userProject => userProject.id === projectId)?.id ??
+            userProjects[0]?.id ??
+            '';
         } else {
-          if (axios.isAxiosError<LoginErrorResponse>(err)) {
-            const apiError = err as AxiosError<LoginErrorResponse>;
-            setError(apiError.response?.data?.error || apiError.message || 'Erreur inconnue');
-          } else if (err instanceof Error) {
-            setError(err.message);
-          } else {
-            setError('Erreur inconnue lors du chargement de la timeline');
-          }
+          const res = await api.get<{ projects: ProjectData[] }>('/api/me');
+          userProjects = res.data.projects || [];
+          setProjects(userProjects);
+          initialProjectId = userProjects[0]?.id ?? '';
+        }
+        setSelectedProjectId(initialProjectId);
+        setContextProjectId(initialProjectId);
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+          const apiError = err as AxiosError<ComponentsFetchErrorResponse>;
+          setError(apiError.response?.data?.error || apiError.message || 'unknown error');
+        } else if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('Erreur lors du chargement des projets.');
         }
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuthAndFetch();
-  }, [router, contextProjectId, loadComponentsForProject, projectId, setContextProjectId]);
-  
+    fetchProjects();
+  }, [projectId, setContextProjectId]);
 
   function onProjectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const pid = Number(event.target.value);
-    setSelectedProjectId(pid);
-    setContextProjectId(pid);
-    const project = projects.find(p => p.projectId === pid);
-    if (project) {
-      setProjectName(project.projectName);
-      loadComponentsForProject(project);
-    }
+    const id = Number(event.target.value);
+    setSelectedProjectId(id);
+    setContextProjectId(id);
   }
 
-  if (loading) return <p>Chargement...</p>;
+  if (loading || authLoading)
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <TextLoader text="FKB" className="fade font-main text-6xl" />
+      </div>
+    );
   if (error) return <p className="text-center text-red-300">{error}</p>;
+
+  // Récupère les composants du projet sélectionné
+  const selectedProject = projects.find(project => project.id === selectedProjectId);
+  const mappedComponents = (selectedProject?.components || []).map(mapApiComponentToCardData);
+  console.log('selectedProject:', selectedProject);
+  const isOwner =
+    auth?.user &&
+    selectedProject &&
+    selectedProject.user &&
+    String(auth?.user.id) === String(selectedProject.user.id);
 
   return (
     <div className="flex min-h-screen flex-col gap-4 bg-gradient-to-br from-[#2C0857] to-purple-400 p-2 pt-12">
@@ -129,28 +116,43 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
       </h1>
       <div className="mb-4 flex items-center justify-center gap-6">
         <select
-          value={selectedProjectId ?? ''}
+          value={selectedProjectId}
           onChange={onProjectChange}
           className="rounded p-2 text-black"
         >
           {projects.map(project => (
-            <option key={project.projectId} value={project.projectId}>
-              {project.projectName}
+            <option key={project.id} value={project.id}>
+              {project.title}
             </option>
           ))}
         </select>
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-white">{user?.id || 'Utilisateur'}</span>
-          <Image
-            src={user?.img && user.img.trim() !== '' ? user.img : '/SvgSite/defaultProfilePic.png'}
-            alt="Profil"
-            width={48}
-            height={48}
-            className="rounded-full border-2 border-white object-cover sm:h-10 sm:w-10 md:h-12 md:w-12"
-          />
-        </div>
+        <span className="text-xl font-bold text-white">
+          {selectedProject?.user?.id || 'Utilisateur'}
+        </span>
+        <Image
+          src={
+            selectedProject?.user?.profile?.photoUrl &&
+            selectedProject?.user?.profile?.photoUrl.trim() !== ''
+              ? selectedProject?.user?.profile?.photoUrl
+              : '/SvgSite/defaultProfilePic.png'
+          }
+          alt="Profil"
+          width={48}
+          height={48}
+          className="rounded-full border-2 border-white object-cover sm:h-10 sm:w-10 md:h-12 md:w-12"
+        />
       </div>
-      <Carousel data={components} />
+      <Carousel data={mappedComponents} />
+      {/* Bouton flottant en bas à droite */}
+      {isOwner && (
+        <Link
+          href={`/add-component?projectId=${selectedProjectId}`}
+          title="Ajouter un composant"
+          className="fixed bottom-8 right-8 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-[#2d005e] px-6 py-2 text-white shadow transition hover:bg-[#6c3cff]"
+        >
+          <span className="text-6xl leading-none">+</span>
+        </Link>
+      )}
     </div>
   );
 }

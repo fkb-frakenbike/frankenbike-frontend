@@ -8,15 +8,14 @@ import api from '../../lib/axios';
 import { User } from '@/app/types/user';
 import { BiMenu, BiX } from 'react-icons/bi';
 
-
 const Header: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [isVisible, setIsVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-   const isWhite = pathname !== '/feed';
+  const isWhite = pathname !== '/feed';
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -40,8 +39,8 @@ const Header: React.FC = () => {
   const navLinks = [
     { href: '/feed', label: 'Feed' },
     { href: '/timeline', label: 'Timeline' },
-    { href: '/addProject', label: 'Créer un Projet' },
-    { href: '/addComponent', label: 'Ajouter un Component' },
+    { href: '/add-project', label: 'Créer un Projet' },
+    { href: '/add-component', label: 'Ajouter un Composant' },
   ];
 
   useEffect(() => {
@@ -57,15 +56,13 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <nav className="fixed z-50 w-full bg-transparent py-2 top-0">
+    <nav className="fixed top-0 z-50 w-full bg-transparent py-2">
       <div className="relative mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className={`flex h-28 justify-between ${!isMobileMenuOpen && 'w-full'}`}>
           {/* Logo*/}
           <div className="flex items-center">
             <Link href="/feed">
-              <h1
-                className={`font-main text-3xl ${isWhite ? 'text-white' : 'text-[#2d005e]'}`}
-              >
+              <h1 className={`font-main text-3xl ${isWhite ? 'text-white' : 'text-[#2d005e]'}`}>
                 FKB
               </h1>
             </Link>
@@ -81,22 +78,22 @@ const Header: React.FC = () => {
                   key={link.href}
                   href={link.href}
                   className={`rounded-md px-3 py-2 text-lg transition-colors ${
-                    isWhite
-                      ? 'text-white hover:text-gray-300'
-                      : 'text-[#2d005e] hover:text-gray-50'
+                    isWhite ? 'text-white hover:text-gray-300' : 'text-[#2d005e] hover:text-gray-50'
                   } ${pathname === link.href ? 'font-bold' : ''}`}
                 >
                   {link.label}
                 </Link>
               ))}
-              {user && <span className={isWhite ? 'text-white' : 'text-[#2d005e]'}>{user.email}</span>}
+              {user && (
+                <span className={isWhite ? 'text-white' : 'text-[#2d005e]'}>{user.email}</span>
+              )}
               {user && <LogoutButton setUser={setUser} setError={setError} />}
             </div>
           )}
         </div>
 
         {/* Mobile menu button */}
-        <div className="flex items-center md:hidden justify-end">
+        <div className="flex items-center justify-end md:hidden">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={`inline-flex items-center justify-center rounded-md p-2 focus:outline-none ${
@@ -104,22 +101,18 @@ const Header: React.FC = () => {
             }`}
             aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
-            {isMobileMenuOpen ? (
-              <BiX className="h-6 w-6" />
-            ) : (
-              <BiMenu className="h-6 w-6" />
-            )}
+            {isMobileMenuOpen ? <BiX className="h-6 w-6" /> : <BiMenu className="h-6 w-6" />}
           </button>
         </div>
       </div>
 
       {/* Mobile menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-3/4 shadow-lg z-50 transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed right-0 top-0 z-50 h-full w-3/4 shadow-lg transition-transform duration-300 ease-in-out md:hidden ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         } overflow-auto ${isWhite ? 'bg-[#2d005e]' : 'bg-white'}`}
       >
-        <div className="flex justify-end p-4 border-b border-gray-200">
+        <div className="flex justify-end border-b border-gray-200 p-4">
           <button
             onClick={() => setIsMobileMenuOpen(false)}
             className={`inline-flex items-center justify-center rounded-md p-2 focus:outline-none ${
@@ -145,7 +138,6 @@ const Header: React.FC = () => {
           ))}
         </div>
       </div>
-
 
       {error && <div className="text-red-600">{error}</div>}
     </nav>

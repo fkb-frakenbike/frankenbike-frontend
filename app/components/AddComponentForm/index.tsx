@@ -64,19 +64,20 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
   const { setSelectedProjectId: setContextProjectId } = useProject();
 
   useEffect(() => {
+    setLoading(true);
     api
       .get('/api/me')
       .then(res => {
         // res.data est un tableau de projets
         setProjects(res.data.projects);
-        console.log(res.data)
         // Optionnel : sélectionne le projet si projectId est fourni
         if (projectId) {
           setSelectedProjectId(projectId);
           setContextProjectId(projectId);
         }
       })
-      .catch(() => setProjects([]));
+      .catch(() => setProjects([]))
+      .finally(() => setLoading(false));
   }, [projectId, setContextProjectId]);
 
   // Handle upload multiple files

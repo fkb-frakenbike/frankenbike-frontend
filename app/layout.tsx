@@ -4,6 +4,7 @@ import React from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Header from './components/Header';
+import { AuthProvider } from './context/AuthContext';
 import { ProjectProvider } from './context/ProjectContext';
 
 const geistSans = Geist({
@@ -24,10 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ProjectProvider>
-          <Header />
-          <main className="m-0 p-0">{children}</main>
-        </ProjectProvider>
+        <AuthProvider>
+          <ProjectProvider>
+            <Header />
+            <main className="m-0 p-0">{children}</main>
+          </ProjectProvider>
+        </AuthProvider>
       </body>
     </html>
   );
