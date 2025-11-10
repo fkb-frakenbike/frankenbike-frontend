@@ -8,7 +8,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ['media.franken-bike.com', 'localhost'],
+    domains: ['media.franken-bike.com', 'localhost', 'www.beachbikes.fr'],
   },
 };
 
