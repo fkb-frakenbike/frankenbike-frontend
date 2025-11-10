@@ -33,7 +33,6 @@ export default function CardComponent({
   color,
   userImg,
   userName,
-  nature,
   date,
 }: CardProps) {
   const [isLiked, setIsLiked] = useState(false);
@@ -83,6 +82,7 @@ export default function CardComponent({
       {variant === 'purpleCard' && (
         <div className="mb-2 px-3 pt-3 text-xl font-bold text-white drop-shadow sm:px-4 md:px-6">
           {name}
+          {displayDate && <div className="text-right text-xs text-white">{displayDate}</div>}
         </div>
       )}
 
@@ -98,14 +98,6 @@ export default function CardComponent({
           <div>
             <div className="text-sm font-semibold text-white">{userName}</div>
             {displayDate && <div className="text-xs text-white">{displayDate}</div>}
-          </div>
-        </div>
-      )}
-
-      {variant === 'purpleCard' && nature && (
-        <div className="px-3 sm:px-4 md:px-6">
-          <div className="mb-2 w-full text-center text-xs font-bold uppercase tracking-wide text-white">
-            {nature}
           </div>
         </div>
       )}

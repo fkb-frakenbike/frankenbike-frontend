@@ -33,6 +33,7 @@ export function mapApiComponentToCardData(apiComponent: Component): CardData {
     likes: apiComponent.likes ?? 0,
     comments: apiComponent.comments ?? 0,
     variant: 'purpleCard',
+    date: apiComponent.createdAt,
     // autres champs...
   };
 }
