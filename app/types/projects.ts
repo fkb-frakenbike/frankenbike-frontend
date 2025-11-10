@@ -1,6 +1,6 @@
 export type Project = {
   id: number;
-  user: { id: number; email: string; profile: { photoUrl: string | null } };
+  user: { id: number; email: string; profile: { firstName: string; photoUrl: string | null } };
   title: string;
   description: string;
   createdAt: string;

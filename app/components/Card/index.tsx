@@ -77,12 +77,16 @@ export default function CardComponent({
 
   return (
     <div
-      className={`h-80 w-64 sm:h-96 sm:w-72 md:h-[420px] md:w-80 ${cardColor} flex flex-col overflow-hidden rounded-xl shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${className} `}
+      className={`relative h-80 w-64 sm:h-96 sm:w-72 md:h-[420px] md:w-80 ${cardColor} flex flex-col rounded-xl shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${className} `}
     >
       {variant === 'purpleCard' && (
         <div className="mb-2 px-3 pt-3 text-xl font-bold text-white drop-shadow sm:px-4 md:px-6">
           {name}
-          {displayDate && <div className="text-right text-xs text-white">{displayDate}</div>}
+          {displayDate && (
+            <div className="absolute -top-10 right-2 z-20 rounded-full bg-white/70 p-2 text-right text-xs text-black shadow-xl">
+              {displayDate}
+            </div>
+          )}
         </div>
       )}
 
