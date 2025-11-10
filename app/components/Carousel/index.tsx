@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import Card from '../Card';
-import { CardData } from '../../types/card';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Card from "../Card";
+import { CardData } from "../../types/card";
 
 type CarouselProps = {
   data: CardData[];
   vertical?: boolean;
 };
 
-function useCardsToShow(cardNumber: number) {
-  const [cardsToShow, setCardsToShow] = useState(cardNumber || 1);
+function useCardsToShow() {
+  const [cardsToShow, setCardsToShow] = useState(1);
 
   useEffect(() => {
     function handleResize() {
@@ -25,73 +25,68 @@ function useCardsToShow(cardNumber: number) {
       }
     }
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return cardsToShow;
 }
 
-function getVisibleIndices(active: number, total: number, cardsToDisplay: number) {
-  const indices = [];
-  for (let i = 0; i < cardsToDisplay; i++) {
-    indices.push((active + i) % total);
-  }
-  return indices;
-}
-
 export default function Carousel({ data, vertical = false }: CarouselProps) {
   const [active, setActive] = useState(0);
-  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
-  const cardsToShow = useCardsToShow(data.length);
+  const cardsToShow = useCardsToShow();
 
   // Si data vide, ne rien afficher
   if (!data || data.length === 0) {
     return <p className="text-center text-gray-500"></p>;
   }
 
-  const handlePrev = () => {
-    setActive(prev => (prev - 1 + data.length) % data.length);
-    setSwipeDirection('right');
-  };
-  const handleNext = () => {
-    setActive(prev => (prev + 1) % data.length);
-    setSwipeDirection('left');
+  // Calcul des indices visibles avec protection data.length > 0
+  const getVisibleIndices = () => {
+    const n = cardsToShow;
+    const indices = [];
+    for (let i = 0; i < n; i++) {
+      const idx = (active + i) % data.length;
+      indices.push(idx);
+    }
+    return indices;
   };
 
-  const dragDirection = vertical ? 'y' : 'x';
+  const handlePrev = () => setActive(prev => (prev - 1 + data.length) % data.length);
+  const handleNext = () => setActive(prev => (prev + 1) % data.length);
+
+  const dragDirection = vertical ? "y" : "x";
   const dragConstraints = vertical ? { top: 0, bottom: 0 } : { left: 0, right: 0 };
   const swipeThreshold = 50;
 
-  const cardsToDisplay = Math.min(cardsToShow, data.length);
-  const visibleIndices = getVisibleIndices(active, data.length, cardsToDisplay);
+  const visibleIndices = getVisibleIndices();
 
   return (
-    <div className={`relative flex min-h-[480px] w-full items-center justify-center py-8`}>
+    <div className={`relative w-full flex items-center justify-center min-h-[480px] py-8`}>
       {/* Bouton précédent */}
       <button
         onClick={handlePrev}
         className={`absolute ${
-          vertical ? 'left-1/2 top-0 -translate-x-1/2' : 'left-0 top-1/2 -translate-y-1/2'
-        } z-20 flex h-12 w-12 transform items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl`}
+          vertical ? "left-1/2 -translate-x-1/2 top-0" : "left-0 top-1/2 -translate-y-1/2"
+        } flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 z-20`}
         aria-label="Carte précédente"
         type="button"
       >
-        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d={vertical ? 'M5 15l7-7 7 7' : 'M15 19l-7-7 7-7'}
+            d={vertical ? "M5 15l7-7 7 7" : "M15 19l-7-7 7-7"}
           />
         </svg>
       </button>
 
       {/* Cartes */}
       <motion.div
-        className={`flex w-full cursor-grab gap-x-2 px-12 active:cursor-grabbing lg:gap-x-4 ${
-          vertical ? 'flex-col' : 'flex-row'
-        } items-center justify-center`}
+        className={`flex cursor-grab active:cursor-grabbing gap-x-2 lg:gap-x-4 px-12 w-full ${
+          vertical ? "flex-col" : "flex-row"
+        } justify-center items-center`}
         drag={dragDirection}
         dragConstraints={dragConstraints}
         onDragEnd={(event, info) => {
@@ -100,38 +95,18 @@ export default function Carousel({ data, vertical = false }: CarouselProps) {
           else if (offset < -swipeThreshold) handleNext();
         }}
       >
-        {visibleIndices.map(i => {
-          const card = data[i];
+        {visibleIndices.map((idx, i) => {
+          const card = data[idx];
           if (!card) return null;
-          const isActive = i === active;
-
-          let marginClass = '';
-          if (swipeDirection === 'left') {
-            marginClass = '-ml-8 md:-ml-12 lg:-ml-20';
-          } else if (swipeDirection === 'right') {
-            marginClass = '-mr-8 md:-mr-12 lg:-mr-20';
-          }
-
+          const isActive = idx === active;
           return (
             <motion.div
-              key={`${card.id ?? i}-${i}`}
-              className={`transition-all duration-300 ${isActive ? 'z-20' : 'z-10'} ${marginClass}`}
-              style={{
-                pointerEvents: 'auto',
-              }}
-              animate={{
-                scale: 1,
-                opacity: 1,
-                zIndex: isActive ? 20 : 10,
-              }}
-              whileHover={{
-                scale: 1.05,
-                transition: { duration: 0.2 },
-              }}
-              whileTap={{
-                scale: 0.95,
-                transition: { duration: 0.1 },
-              }}
+              key={`${card.id}-${i}`}
+              className={`transition-all duration-300 ${isActive ? "z-20" : "z-10"}`}
+              style={{ pointerEvents: "auto" }}
+              animate={{ scale: 1, opacity: 1, zIndex: isActive ? 20 : 10 }}
+              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.95, transition: { duration: 0.1 } }}
             >
               <Card {...card} />
             </motion.div>
@@ -142,22 +117,22 @@ export default function Carousel({ data, vertical = false }: CarouselProps) {
       <button
         onClick={handleNext}
         className={`absolute ${
-          vertical ? 'bottom-0 left-1/2 -translate-x-1/2' : 'right-0 top-1/2 -translate-y-1/2'
-        } z-20 flex h-12 w-12 transform items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl`}
+          vertical ? "left-1/2 -translate-x-1/2 bottom-0" : "right-0 top-1/2 -translate-y-1/2"
+        } flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 z-20`}
         aria-label="Carte suivante"
         type="button"
       >
-        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d={vertical ? 'M19 9l-7 7-7-7' : 'M9 5l7 7-7 7'}
+            d={vertical ? "M19 9l-7 7-7-7" : "M9 5l7 7-7 7"}
           />
         </svg>
       </button>
       {/* Informations */}
-      <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 text-center text-sm text-gray-500">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-center text-gray-500 text-sm pointer-events-none">
         {vertical ? (
           <p>Swipe vertical pour naviguer</p>
         ) : (

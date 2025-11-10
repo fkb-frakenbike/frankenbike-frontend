@@ -17,23 +17,29 @@ const Header: React.FC = () => {
   const pathname = usePathname();
   const isWhite = pathname !== '/feed';
 
+  // Gestion visibilité header au scroll
   useEffect(() => {
     let lastScrollY = window.scrollY;
-
     const controlHeaderVisibility = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
+      setIsVisible(currentScrollY <= lastScrollY || currentScrollY <= 100);
       lastScrollY = currentScrollY;
     };
-
     window.addEventListener('scroll', controlHeaderVisibility);
-    return () => {
-      window.removeEventListener('scroll', controlHeaderVisibility);
+    return () => window.removeEventListener('scroll', controlHeaderVisibility);
+  }, []);
+
+  // Récupération user au montage
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await api.get('/api/me');
+        setUser(res.data.user || null);
+      } catch {
+        setUser(null);
+      }
     };
+    fetchUser();
   }, []);
 
   const navLinks = [
@@ -43,52 +49,36 @@ const Header: React.FC = () => {
     { href: '/add-component', label: 'Ajouter un Composant' },
   ];
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get('/api/me');
-        setUser(res.data);
-      } catch {
-        setUser(null);
-      }
-    };
-    fetchUser();
-  }, []);
-
   return (
     <nav className="fixed top-0 z-50 w-full bg-transparent py-2">
       <div className="relative mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className={`flex h-28 justify-between ${!isMobileMenuOpen && 'w-full'}`}>
-          {/* Logo*/}
+          {/* Logo */}
           <div className="flex items-center">
             <Link href="/feed">
-              <h1 className={`font-main text-3xl ${isWhite ? 'text-white' : 'text-[#2d005e]'}`}>
-                FKB
-              </h1>
+              <h1 className={`font-main text-3xl ${isWhite ? 'text-white' : 'text-[#2d005e]'}`}>FKB</h1>
             </Link>
           </div>
 
-          {/* Navigation links */}
+          {/* Liens navigation desktop */}
           {!['/login', '/register'].includes(pathname) && (
             <div
-              className={`h-full ${isVisible ? 'translate-y-0' : '-translate-y-full'} hidden items-center space-x-8 transition-transform duration-300 ease-in-out md:flex`}
+              className={`h-full ${
+                isVisible ? 'translate-y-0' : '-translate-y-full'
+              } hidden items-center space-x-8 transition-transform duration-300 ease-in-out md:flex`}
             >
-              {navLinks.map(link => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`rounded-md px-3 py-2 text-lg transition-colors  ${
-                    isWhite
-                      ? 'text-white'
-                      : 'text-[#2d005e]'
+                  className={`rounded-md px-3 py-2 text-lg transition-colors ${
+                    isWhite ? 'text-white' : 'text-[#2d005e]'
                   } ${pathname === link.href ? 'font-bold' : ''}`}
                 >
                   {link.label}
                 </Link>
               ))}
-              {user && (
-                <span className={isWhite ? 'text-white' : 'text-[#2d005e]'}>{user.email}</span>
-              )}
+              {user && <span className={isWhite ? 'text-white' : 'text-[#2d005e]'}>{user.email}</span>}
               {user && <LogoutButton setUser={setUser} setError={setError} />}
             </div>
           )}
@@ -108,11 +98,11 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Menu mobile coulissant */}
       <div
-        className={`fixed right-0 top-0 z-50 h-full w-3/4 shadow-lg transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed right-0 top-0 z-50 h-full w-3/4 overflow-auto shadow-lg transition-transform duration-300 ease-in-out md:hidden ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        } overflow-auto ${isWhite ? 'bg-[#2d005e]' : 'bg-white'}`}
+        } ${isWhite ? 'bg-[#2d005e]' : 'bg-white'}`}
       >
         <div className="flex justify-end border-b border-gray-200 p-4">
           <button
@@ -126,7 +116,7 @@ const Header: React.FC = () => {
           </button>
         </div>
         <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-          {navLinks.map(link => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -138,6 +128,15 @@ const Header: React.FC = () => {
               {link.label}
             </Link>
           ))}
+
+          {user && (
+            <div className="mt-4 border-t border-gray-300 pt-4">
+              <span className={`${isWhite ? 'text-white' : 'text-[#2d005e]'} block mb-2`}>
+                {user.email}
+              </span>
+              <LogoutButton setUser={setUser} setError={setError} />
+            </div>
+          )}
         </div>
       </div>
 
