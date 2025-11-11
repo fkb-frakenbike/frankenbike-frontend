@@ -1,4 +1,5 @@
 'use client';
+
 import '../../components/TextLoader/TextLoader.css';
 import React, { useEffect, useState } from 'react';
 import Carousel from '../Carousel';
@@ -37,8 +38,6 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
   const { setSelectedProjectId: setContextProjectId } = useProject();
   const { auth, loading: authLoading } = useAuth();
 
-  console.log('authenticated user in TimelinePage:', auth);
-
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
@@ -48,11 +47,8 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
 
         if (typeof projectId === 'number') {
           const projectRes = await api.get<ProjectApiResponse>(`/api/projects/${projectId}`);
-          console.log('fetched project:', projectRes.data);
           const userId = projectRes.data.user.id;
-          const userProjectsRes = await api.get<{ data: ProjectData[] }>(
-            `/api/users/${userId}/projects`
-          );
+          const userProjectsRes = await api.get<{ data: ProjectData[] }>(`/api/users/${userId}/projects`);
           userProjects = userProjectsRes.data.data || [];
           setProjects(userProjects);
 
@@ -99,10 +95,8 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
     );
   if (error) return <p className="text-center text-red-300">{error}</p>;
 
-  // Récupère les composants du projet sélectionné
   const selectedProject = projects.find(project => project.id === selectedProjectId);
   const mappedComponents = (selectedProject?.components || []).map(mapApiComponentToCardData);
-  console.log('selectedProject:', selectedProject);
   const isOwner =
     auth?.user &&
     selectedProject &&
@@ -114,13 +108,14 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
       <h1 className="mb-4 mt-16 text-center text-2xl font-bold text-white drop-shadow md:text-3xl">
         Timeline
       </h1>
+
       <div className="mb-4 flex items-center justify-center gap-6">
         <select
           value={selectedProjectId}
           onChange={onProjectChange}
           className="rounded p-2 text-black"
         >
-          {projects.map(project => (
+          {projects.map((project) => (
             <option key={project.id} value={project.id}>
               {project.title}
             </option>
@@ -142,9 +137,29 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
           className="rounded-full border-2 border-white object-cover sm:h-10 sm:w-10 md:h-12 md:w-12"
         />
       </div>
-      <Carousel data={mappedComponents} />
-      {/* Bouton flottant en bas à droite */}
-      {isOwner && (
+
+      {/* Affiche le carousel si au moins un composant, sinon message + bouton ajout si propriétaire */}
+      {mappedComponents.length > 0 ? (
+        <Carousel data={mappedComponents} />
+      ) : (
+        <div className="flex flex-col items-center gap-6 py-12 text-center text-lg font-semibold text-[#2d005e]">
+          <p>Aucun composant disponible pour ce projet.</p>
+          {isOwner && (
+            <>
+              <p>Ajoutez le premier composant !</p>
+              <Link
+                href={`/add-component?projectId=${selectedProjectId}`}
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2d005e] px-6 py-2 text-white shadow transition hover:bg-[#6c3cff]"
+              >
+                <span className="text-6xl leading-none">+</span>
+              </Link>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Bouton flottant d'ajout si propriétaire et s'il y a déjà des composants */}
+      {isOwner && mappedComponents.length > 0 && (
         <Link
           href={`/add-component?projectId=${selectedProjectId}`}
           title="Ajouter un composant"
