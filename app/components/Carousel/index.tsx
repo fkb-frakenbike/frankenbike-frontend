@@ -44,7 +44,7 @@ function getVisibleIndices(active: number, total: number, cardsToDisplay: number
 
 export default function Carousel({ data, vertical = false }: CarouselProps) {
    const [active, setActive] = useState(0);
-  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   const cardsToShow = useCardsToShow(data.length);
 
   // Si data vide, ne rien afficher
@@ -110,12 +110,6 @@ export default function Carousel({ data, vertical = false }: CarouselProps) {
           if (!card) return null;
           const isActive = i === active;
 
-          let marginClass = '';
-          if (swipeDirection === 'left') {
-            marginClass = '-ml-8 md:-ml-12 lg:-ml-20';
-          } else if (swipeDirection === 'right') {
-            marginClass = '-mr-8 md:-mr-12 lg:-mr-20';
-          }
           return (
             <motion.div
               key={`${card.id}-${i}`}
