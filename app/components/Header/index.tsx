@@ -87,6 +87,7 @@ const Header: React.FC = () => {
         </div>
 
         {/* Mobile menu button */}
+        {!['/login', '/register'].includes(pathname) && (
         <div className="flex items-center justify-end lg:hidden">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -98,7 +99,8 @@ const Header: React.FC = () => {
             {isMobileMenuOpen ? <BiX className="h-6 w-6" /> : <BiMenu className="h-6 w-6" />}
           </button>
         </div>
-      </div>
+        )}
+      </div>  
 
       {/* Menu mobile coulissant */}
       <div
