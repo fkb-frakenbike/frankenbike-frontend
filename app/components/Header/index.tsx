@@ -43,11 +43,13 @@ const Header: React.FC = () => {
   }, []);
 
   const navLinks = [
-    { href: '/feed', label: 'Feed' },
-    { href: '/timeline', label: 'Timeline' },
-    { href: '/add-project', label: 'Créer un Projet' },
-    { href: '/add-component', label: 'Ajouter un Composant' },
-  ];
+  { href: '/feed', label: 'Feed' },
+  { href: '/timeline', label: 'Timeline' },
+  { href: '/add-project', label: 'Créer un Projet' },
+  { href: '/add-component', label: 'Ajouter un Composant' },
+  { href: '/mentions-legales', label: 'Mentions légales' },
+];
+
 
   return (
     <nav className="fixed top-0 z-50 w-full bg-transparent py-2">
@@ -65,7 +67,7 @@ const Header: React.FC = () => {
             <div
               className={`h-full ${
                 isVisible ? 'translate-y-0' : '-translate-y-full'
-              } hidden items-center space-x-8 transition-transform duration-300 ease-in-out md:flex`}
+              } hidden items-center space-x-8 transition-transform duration-300 ease-in-out lg:flex`}
             >
               {navLinks.map((link) => (
                 <Link
@@ -85,7 +87,7 @@ const Header: React.FC = () => {
         </div>
 
         {/* Mobile menu button */}
-        <div className="flex items-center justify-end md:hidden">
+        <div className="flex items-center justify-end lg:hidden">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={`inline-flex items-center justify-center rounded-md p-2 focus:outline-none ${
@@ -100,7 +102,7 @@ const Header: React.FC = () => {
 
       {/* Menu mobile coulissant */}
       <div
-        className={`fixed right-0 top-0 z-50 h-full w-3/4 overflow-auto shadow-lg transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed right-0 top-0 z-50 h-full w-3/4 overflow-auto shadow-lg transition-transform duration-300 ease-in-out lg:hidden ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         } ${isWhite ? 'bg-[#2d005e]' : 'bg-white'}`}
       >

@@ -80,10 +80,19 @@ const Feed = () => {
           <Link
             href="/add-project"
             title="Créer un projet"
-            className="fixed bottom-8 right-8 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-[#2d005e] px-6 py-2 text-white shadow transition hover:bg-[#6c3cff]"
+            className="
+              fixed bottom-8 right-4 z-50
+              flex items-center justify-center rounded-full
+              bg-[#2d005e] text-white shadow transition hover:bg-[#6c3cff]
+              h-10 w-10            /* mobile d'abord, petit bouton */
+              sm:h-12 sm:w-12      /* petit écran/tablette */
+              md:h-16 md:w-16      /* écran moyen/desktop */
+              px-4 py-2            /* padding horizontal/vertical */
+            "
           >
-            <span className="text-6xl leading-none">+</span>
-          </Link>
+  <span className="text-4xl sm:text-5xl md:text-6xl leading-none">+</span>
+</Link>
+
         </>
       )}
       {loadingMore && <div className="py-4 text-center text-gray-500">Chargement…</div>}
