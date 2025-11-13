@@ -6,6 +6,7 @@ import './globals.css';
 import Header from './components/Header';
 import { AuthProvider } from './context/AuthContext';
 import { ProjectProvider } from './context/ProjectContext';
+import { usePathname } from 'next/navigation';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,12 +23,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const hideHeader = pathname === '/login' || pathname === '/register';
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <ProjectProvider>
-            <Header />
+            {!hideHeader && <Header />}
             <main className="m-0 p-0">{children}</main>
           </ProjectProvider>
         </AuthProvider>
