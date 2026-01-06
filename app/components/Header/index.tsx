@@ -48,12 +48,13 @@ const Header: React.FC = () => {
   { href: '/add-project', label: 'Créer un Projet' },
   { href: '/add-component', label: 'Ajouter un Composant' },
   { href: '/mentions-legales', label: 'Mentions légales' },
+  { href: '/dashboard-user', label: 'Compte' },
 ];
 
 
   return (
     <nav className="fixed top-0 z-50 w-full bg-transparent py-2">
-      <div className="relative mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex max-w-8xl items-center justify-between px-8 sm:px-6 lg:px-8">
         <div className={`flex h-28 justify-between ${!isMobileMenuOpen && 'w-full'}`}>
           {/* Logo */}
           <div className="flex items-center">
