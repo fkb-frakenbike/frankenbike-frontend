@@ -167,32 +167,36 @@ export default function UserDashboardComponent() {
                 Connecté en tant que : <span className="font-semibold">{user?.profile?.firstName}</span>
               </p>
 
-              <form onSubmit={handleSubmit}>
-                {/* Avatar avec key + priority pour force refresh */}
-                <div className="w-full rounded-sm relative h-52 overflow-hidden">
-                  <div className="absolute inset-0 flex justify-center items-center">
-                    <div key={imageKey} className="relative w-[141px] h-[141px] rounded-full overflow-hidden bg-blue-300/20">  {/* ✅ key force re-mount */}
-                      <Image 
-                        src={profilePreview} 
-                        alt="Profile" 
-                        fill 
-                        sizes="141px" 
-                        style={{ objectFit: "cover" }}
-                        priority  // ✅ Priorité haute = bypass cache
-                      />
-                      <div className="bg-white/90 rounded-full w-6 h-6 absolute top-2 right-2">
-                        <input
-                          type="file"
-                          id="upload_profile"
-                          hidden
-                          accept="image/*"
-                          onChange={handleProfileChange}
-                        />
-                        <label htmlFor="upload_profile" className="cursor-pointer inline-flex items-center justify-center w-full h-full rounded-full" />
-                      </div>
-                    </div>
-                  </div>
+             <form onSubmit={handleSubmit}>
+  {/* Avatar - CLIC DIRECT sur image */}
+            <div className="w-full rounded-sm relative h-52 overflow-hidden">
+              <div className="absolute inset-0 flex justify-center items-center">
+                <div key={imageKey} className="relative w-[141px] h-[141px] rounded-full overflow-hidden bg-blue-300/20 cursor-pointer hover:ring-4 hover:ring-blue-500/50 transition-all">
+                  <Image 
+                    src={profilePreview} 
+                    alt="Profile - Cliquez pour changer" 
+                    fill 
+                    sizes="141px" 
+                    style={{ objectFit: "cover" }}
+                    priority
+                  />
+                  
+                  {/* ✅ Input + label CACHÉS sur TOUT l'avatar */}
+                  <input
+                    type="file"
+                    id="upload_profile"
+                    hidden
+                    accept="image/*"
+                    onChange={handleProfileChange}
+                  />
+                  <label 
+                    htmlFor="upload_profile" 
+                    className="absolute inset-0 cursor-pointer rounded-full"  // ✅ Clic partout sur image
+                  />
                 </div>
+              </div>
+            </div>
+
 
                 <div className="flex flex-col lg:flex-row gap-2 justify-center w-full">
                   <div className="w-full mb-4 mt-6">
