@@ -13,11 +13,27 @@ import { useAuth } from '@/app/context/AuthContext';
 import TextLoader from '../TextLoader/TextLoader';
 import Image from 'next/image';
 
+interface Profile {
+  firstName?: string;
+  photoUrl?: string | null;
+}
+
+interface User {
+  id: number;
+  email: string;
+  profile: Profile | [] | null;
+}
+
 type ProjectData = {
   id: number;
   title: string;
   components: Component[];
-  user: { id: number; email: string; profile: { firstName: string; photoUrl: string | null } };
+  user: User;
+};
+
+type ApiMeResponse = {
+  projects: ProjectData[];
+  user?: User;
 };
 
 interface ProjectApiResponse {
@@ -41,6 +57,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
+      setError(null);
       try {
         let userProjects: ProjectData[] = [];
         let initialProjectId: number | '' = '';
@@ -50,29 +67,41 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
           const userId = projectRes.data.user.id;
           const userProjectsRes = await api.get<{ data: ProjectData[] }>(`/api/users/${userId}/projects`);
           userProjects = userProjectsRes.data.data || [];
-          setProjects(userProjects);
-
-          initialProjectId =
-            userProjects.find(userProject => userProject.id === projectId)?.id ??
-            userProjects[0]?.id ??
-            '';
+          console.log('projects from /api/users/:id/projects', userProjects);
         } else {
-          const res = await api.get<{ projects: ProjectData[] }>('/api/me');
+          const res = await api.get<ApiMeResponse>('/api/me');
           userProjects = res.data.projects || [];
-          setProjects(userProjects);
-          initialProjectId = userProjects[0]?.id ?? '';
+          console.log('projects from /api/me', userProjects);
+
+          // ✅ Fix TypeScript : gère undefined → null + [] vide
+          const apiUserProfile: Profile | null = res.data.user?.profile && !Array.isArray(res.data.user.profile) 
+            ? res.data.user.profile 
+            : null;
+
+          // Copie profile vers tous les projects (safe)
+          if (apiUserProfile && userProjects.length > 0) {
+            userProjects.forEach(project => {
+              if (!project.user.profile || Array.isArray(project.user.profile)) {
+                project.user.profile = apiUserProfile;
+              }
+            });
+          }
         }
+
+        setProjects(userProjects);
+        initialProjectId = userProjects.find(p => p.id === projectId)?.id ?? userProjects[0]?.id ?? '';
         setSelectedProjectId(initialProjectId);
         setContextProjectId(initialProjectId);
       } catch (err: unknown) {
         if (axios.isAxiosError(err)) {
           const apiError = err as AxiosError<ComponentsFetchErrorResponse>;
-          setError(apiError.response?.data?.error || apiError.message || 'unknown error');
+          setError(apiError.response?.data?.error || apiError.message || 'Erreur API');
         } else if (err instanceof Error) {
           setError(err.message);
         } else {
           setError('Erreur lors du chargement des projets.');
         }
+        console.error('Fetch projects error:', err);
       } finally {
         setLoading(false);
       }
@@ -100,8 +129,15 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
   const isOwner =
     auth?.user &&
     selectedProject &&
-    selectedProject.user &&
     String(auth?.user.id) === String(selectedProject.user.id);
+
+  // ✅ Safe profile access
+  const profileData = selectedProject?.user.profile && !Array.isArray(selectedProject.user.profile)
+    ? selectedProject.user.profile
+    : null;
+  const displayName = profileData?.firstName || 'Utilisateur';
+  const displayPhoto = profileData?.photoUrl?.trim() 
+  ? `${profileData.photoUrl}?v=${crypto.randomUUID()}` : '/SvgSite/defaultProfilePic.png';
 
   return (
     <div className="flex min-h-screen flex-col gap-4 bg-gradient-to-br from-[#2C0857] to-purple-400 p-2 pt-12">
@@ -122,15 +158,10 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
           ))}
         </select>
         <span className="text-xl font-bold text-white">
-          {selectedProject?.user?.profile?.firstName || 'Utilisateur'}
+          {displayName}
         </span>
         <Image
-          src={
-            selectedProject?.user?.profile?.photoUrl &&
-            selectedProject?.user?.profile?.photoUrl.trim() !== ''
-              ? selectedProject?.user?.profile?.photoUrl
-              : '/SvgSite/defaultProfilePic.png'
-          }
+          src={displayPhoto}
           alt="Profil"
           width={48}
           height={48}
@@ -138,7 +169,6 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         />
       </div>
 
-      {/* Affiche le carousel si au moins un composant, sinon message + bouton ajout si propriétaire */}
       {mappedComponents.length > 0 ? (
         <Carousel data={mappedComponents} />
       ) : (
@@ -158,7 +188,6 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         </div>
       )}
 
-      {/* Bouton flottant d'ajout si propriétaire et s'il y a déjà des composants */}
       {isOwner && mappedComponents.length > 0 && (
         <Link
           href={`/add-component?projectId=${selectedProjectId}`}

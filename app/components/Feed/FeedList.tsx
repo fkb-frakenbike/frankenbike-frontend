@@ -5,29 +5,33 @@ import { Project } from '@/app/types/projects';
 
 const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
   console.log('FeedList projects:', projects);
+  
   return (
     <div className="grid min-h-full grid-cols-1 justify-items-center gap-6">
       {Array.isArray(projects) && projects.length > 0 ? (
-        projects.map(project => (
-          <Link key={project.id} href={`/timeline?projectId=${project.id}`}>
-            <CardComponent
-              key={project.id}
-              name={project.title}
-              description={project.description}
-              img={project.imageUrl}
-              comments={project.comments.length}
-              date={project.updatedAt}
-              userName={project.user.profile.firstName || 'Utilisateur'}
-              userImg={
-                project.user.profile.photoUrl && project.user.profile.photoUrl.trim() !== ''
-                  ? project.user.profile.photoUrl
-                  : '/SvgSite/defaultProfilePic.png'
-              }
-              variant="cardcolor"
-              likes={0}
-            />
-          </Link>
-        ))
+        projects.map(project => {
+          // ✅ Cache-bust AGRESSIF pour photo profil
+          const userImg = project.user.profile.photoUrl && project.user.profile.photoUrl.trim() !== ''
+            ? `${project.user.profile.photoUrl}?v=${crypto.randomUUID()}`
+            : '/SvgSite/defaultProfilePic.png';
+          
+          return (
+            <Link key={project.id} href={`/timeline?projectId=${project.id}`}>
+              <CardComponent
+                key={project.id}
+                name={project.title}
+                description={project.description}
+                img={project.imageUrl}
+                comments={project.comments.length}
+                date={project.updatedAt}
+                userName={project.user.profile.firstName || 'Utilisateur'}
+                userImg={userImg}  // ✅ Nouvelle photo garantie !
+                variant="cardcolor"
+                likes={0}
+              />
+            </Link>
+          );
+        })
       ) : (
         <div className="flex flex-col items-center gap-6 py-12">
           <p className="text-center text-lg font-semibold text-[#2d005e]">

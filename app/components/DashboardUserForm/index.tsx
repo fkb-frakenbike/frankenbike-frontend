@@ -9,8 +9,7 @@ import TextLoader from "../TextLoader/TextLoader";
 type Profile = {
   firstName: string;
   photoUrl?: string | null;
-  coverPhotoUrl?: string | null;
-  birthdate?: string | null;  // ✅ minuscule comme entity
+  birthdate?: string | null;
 };
 
 type User = {
@@ -25,42 +24,25 @@ type ProfileData = {
 
 export default function UserDashboardComponent() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [birthDate, setBirthDate] = useState("");  // YYYY-MM-DD pour <input type="date">
+  const [birthDate, setBirthDate] = useState("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [profilePreview, setProfilePreview] = useState("/SvgSite/defaultProfilePic.png");
   const [newProfileFile, setNewProfileFile] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState("/bikeCustom.png");
+  const [imageKey, setImageKey] = useState(0);  // ✅ Key unique pour forcer Image re-render
   const { auth, loading: authLoading } = useAuth();
 
-  // ✅ formatDate : transforme n'importe quel format → YYYY-MM-DD
   const formatDate = (dateStr: string | null | undefined): string => {
     if (!dateStr) return "";
-    
-    console.log("formatDate input:", dateStr);
-    
-    // Si déjà YYYY-MM-DD
     if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
-      const result = dateStr.split('T')[0];  // enlève l'heure si présente
-      console.log("→ déjà bon format:", result);
-      return result;
+      return dateStr.split('T')[0];
     }
-    
-    // Fallback universel
     const date = new Date(dateStr);
-    if (!isNaN(date.getTime())) {
-      const result = date.toISOString().split('T')[0];
-      console.log("→ new Date() →", result);
-      return result;
-    }
-    
-    console.warn("Format inconnu:", dateStr);
-    return "";
+    return !isNaN(date.getTime()) ? date.toISOString().split('T')[0] : "";
   };
 
-  // Fetch profil
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
@@ -69,19 +51,19 @@ export default function UserDashboardComponent() {
         const res = await api.get<ProfileData>("/api/me");
         const userData = res.data;
         setProfile(userData);
-
-        console.log("RAW birthdate:", userData.user.profile?.birthdate);
-
-        // Initialise ✅
         setFirstName(userData.user.profile?.firstName || "");
-        setBirthDate(formatDate(userData.user.profile?.birthdate));  // ✅
+        setBirthDate(formatDate(userData.user.profile?.birthdate));
         setEmail(userData.user.email || "");
-        setProfilePreview(userData.user.profile?.photoUrl || "/SvgSite/defaultProfilePic.png");
-        setCoverPreview(userData.user.profile?.coverPhotoUrl || "/bikeCustom.png");
+        // ✅ Cache-bust + UUID pour image S3/CDN
+        const photoUrl = userData.user.profile?.photoUrl;
+        setProfilePreview(photoUrl 
+          ? `${photoUrl}?v=${crypto.randomUUID()}` 
+          : "/SvgSite/defaultProfilePic.png"
+        );
       } catch (err: unknown) {
-  const axiosError = err as { response?: { data?: { error?: string } } };
-  setError(axiosError?.response?.data?.error || "Erreur");
-} finally {
+        const axiosError = err as { response?: { data?: { error?: string } } };
+        setError(axiosError?.response?.data?.error || "Erreur");
+      } finally {
         setLoading(false);
       }
     };
@@ -97,71 +79,62 @@ export default function UserDashboardComponent() {
     setNewProfileFile(file);
     const url = URL.createObjectURL(file);
     setProfilePreview(url);
+    setImageKey(prev => prev + 1);  // ✅ Incrémente key pour preview
   };
 
-  const handleCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setCoverPreview(url);
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const updateRes = await api.put("/api/me", { 
+        firstName, 
+        email, 
+        birthdate: birthDate || null 
+      });
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  
-  try {
-    const updateRes = await api.put("/api/me", { 
-      firstName, 
-      email, 
-      birthdate: birthDate || null 
-    });
+      let authToken = localStorage.getItem('token') || '';
+      if (updateRes.data.token) {
+        localStorage.setItem('token', updateRes.data.token);
+        authToken = updateRes.data.token;
+      }
 
-    let authToken = localStorage.getItem('token') || '';
-    if (updateRes.data.token) {
-      localStorage.setItem('token', updateRes.data.token);
-      authToken = updateRes.data.token;
-    }
+      if (newProfileFile) {
+        const photoFormData = new FormData();
+        photoFormData.append('photo', newProfileFile);
+        await api.post("/api/me/photo", photoFormData, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+      }
 
-    let photoTimestamp = Date.now();
-    if (newProfileFile) {
-      const photoFormData = new FormData();
-      photoFormData.append('photo', newProfileFile);
-      await api.post("/api/me/photo", photoFormData, {
+      // ✅ Refetch + cache-bust AGRESSIF + nouvelle key
+      const meRes = await api.get<ProfileData>("/api/me", {
         headers: { Authorization: `Bearer ${authToken}` }
       });
-      photoTimestamp = Date.now();
+
+      const userData = meRes.data;
+      setProfile(userData);
+      setFirstName(userData.user.profile?.firstName || "");
+      setBirthDate(formatDate(userData.user.profile?.birthdate));
+      setEmail(userData.user.email || "");
+      
+      const photoUrl = userData.user.profile?.photoUrl;
+      setProfilePreview(photoUrl 
+        ? `${photoUrl}?v=${crypto.randomUUID()}`  // ✅ UUID unique à CHAQUE refetch
+        : "/SvgSite/defaultProfilePic.png"
+      );
+      setImageKey(prev => prev + 1);  // ✅ Force Image à re-render
+
+      alert("Profil sauvegardé !");
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { error?: string } } };
+      const errorMsg = axiosError?.response?.data?.error || "Erreur sauvegarde";
+      setError(errorMsg);
+      console.error("Erreur:", err);
+    } finally {
+      setLoading(false);
     }
-
-    // ✅ Refetch avec token
-    const meRes = await api.get<ProfileData>("/api/me", {
-      headers: { Authorization: `Bearer ${authToken}` }
-    });
-
-    const userData = meRes.data;
-    setProfile(userData);
-
-    setFirstName(userData.user.profile?.firstName || "");
-    setBirthDate(formatDate(userData.user.profile?.birthdate));
-    setEmail(userData.user.email || "");
-    
-    const finalPhotoUrl = (userData.user.profile?.photoUrl || "/SvgSite/defaultProfilePic.png") + `?t=${photoTimestamp}`;
-    setProfilePreview(finalPhotoUrl);
-
-    alert("Profil sauvegardé !");
-  } catch (err: unknown) {  // ✅ unknown au lieu de any
-    // Type guard pour AxiosError
-    const axiosError = err as { response?: { data?: { error?: string } } };
-    const errorMsg = axiosError?.response?.data?.error || "Erreur sauvegarde";
-    setError(errorMsg);
-    console.error("Erreur:", err);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
+  };
 
   if (loading || authLoading) {
     return (
@@ -195,12 +168,18 @@ const handleSubmit = async (e: React.FormEvent) => {
               </p>
 
               <form onSubmit={handleSubmit}>
-                {/* Cover + Avatar */}
+                {/* Avatar avec key + priority pour force refresh */}
                 <div className="w-full rounded-sm relative h-52 overflow-hidden">
-                  <Image src={coverPreview} alt="Cover" fill sizes="100vw" style={{ objectFit: "cover" }} />
                   <div className="absolute inset-0 flex justify-center items-center">
-                    <div className="relative w-[141px] h-[141px] rounded-full overflow-hidden bg-blue-300/20">
-                      <Image  key={profilePreview} src={profilePreview} alt="Profile" fill sizes="141px" style={{ objectFit: "cover" }} />
+                    <div key={imageKey} className="relative w-[141px] h-[141px] rounded-full overflow-hidden bg-blue-300/20">  {/* ✅ key force re-mount */}
+                      <Image 
+                        src={profilePreview} 
+                        alt="Profile" 
+                        fill 
+                        sizes="141px" 
+                        style={{ objectFit: "cover" }}
+                        priority  // ✅ Priorité haute = bypass cache
+                      />
                       <div className="bg-white/90 rounded-full w-6 h-6 absolute top-2 right-2">
                         <input
                           type="file"
@@ -211,12 +190,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                         />
                         <label htmlFor="upload_profile" className="cursor-pointer inline-flex items-center justify-center w-full h-full rounded-full" />
                       </div>
-                    </div>
-                  </div>
-                  <div className="absolute top-0 right-0">
-                    <input type="file" id="upload_cover" hidden accept="image/*" onChange={handleCoverChange} />
-                    <div className="bg-white flex items-center gap-1 rounded-tl-md px-2 font-semibold cursor-pointer">
-                      <label htmlFor="upload_cover" className="inline-flex items-center gap-1">Cover</label>
                     </div>
                   </div>
                 </div>
