@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import api from '../../lib/axios';
 import { useAuth } from "@/app/context/AuthContext";
