@@ -4,6 +4,7 @@ export type CardVariant = 'cardcolor' | 'purpleCard';
 
 export type CardData = {
   id?: number; // Id optionnel si certains composants ne l'utilisent pas
+  projectId?: number;
   name: string;
   description: string;
   category?: string;
@@ -27,6 +28,7 @@ export type CardData = {
 export function mapApiComponentToCardData(apiComponent: Component): CardData {
   return {
     id: apiComponent.id,
+    projectId: apiComponent.projectId,
     name: apiComponent.name,
     description: apiComponent.description,
     img: apiComponent.photoS3Key,

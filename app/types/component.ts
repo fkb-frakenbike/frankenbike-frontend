@@ -22,6 +22,7 @@ export enum ComponentOrigin {
 
 export type Component = {
   id: number;
+  projectId: number;
   name: string;
   description: string;
   origin: ComponentOrigin;

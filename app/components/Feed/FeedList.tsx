@@ -16,9 +16,11 @@ const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
             : '/SvgSite/defaultProfilePic.png';
           
           return (
-            <Link key={project.id} href={`/timeline?projectId=${project.id}`}>
+            
               <CardComponent
                 key={project.id}
+                id={project.id}                 // si tu veux garder id = project.id
+                projectId={project.id}  
                 name={project.title}
                 description={project.description}
                 img={project.imageUrl}
@@ -29,7 +31,7 @@ const FeedList: React.FC<{ projects: Project[] }> = ({ projects }) => {
                 variant="cardcolor"
                 likes={0}
               />
-            </Link>
+      
           );
         })
       ) : (
