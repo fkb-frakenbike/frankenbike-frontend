@@ -10,6 +10,7 @@ interface InputFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
   className?: string;
+  validationError?: string | null;
   accept?: string;
   multiple?: boolean;
   style?: React.CSSProperties;
@@ -27,6 +28,7 @@ export default function InputField({
   accept,
   multiple,
   style,
+  validationError,
 }: InputFieldProps) {
   const [passwordType, setPasswordType] = React.useState('password');
   const [svgIcon, setSvgIcon] = React.useState(<VscEyeClosed />);
@@ -48,14 +50,19 @@ export default function InputField({
         {label}
       </label>
       <div className="relative">
-        <input
+         <input
           type={isPasswordField ? passwordType : type}
           id={id}
           name={name}
           value={type === 'file' ? undefined : value}
           onChange={onChange}
           required={required}
-          className={className}
+          className={`
+            ${className}
+            ${validationError ? 'border-red-500 bg-red-50/50' : 'border-gray-300'}  // ✅ Bordure rouge si erreur
+            focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200
+            w-full rounded-md px-3 py-2 shadow-sm
+          `}
           accept={accept}
           multiple={multiple}
           style={style}
@@ -67,6 +74,20 @@ export default function InputField({
           >
             {svgIcon}
           </span>
+        )}
+      </div>
+      <div className="h-5">
+        {/* ✅ MESSAGE D'ERREUR ICI - s'affiche seulement si validationError existe */}
+          {validationError && (
+            <p className="mt-1 text-xs text-red-500 font-medium absolute left-0">
+              {validationError}  {/* "Le mot de passe doit contenir..." */}
+            </p>
+          )}
+         {/* ✅ MESSAGE D'ERREUR ICI - s'affiche seulement si validationError existe */}
+        {validationError && (
+          <p className="mt-1 text-xs text-red-500 font-medium absolute left-0">
+            {validationError}  {/* "L'email n'est pas valide" */}
+          </p>
         )}
       </div>
     </div>

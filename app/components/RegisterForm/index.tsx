@@ -7,7 +7,6 @@ import api from '@/app/lib/axios';
 
 interface SignUpFormState {
   firstname: string;
-  lastname: string;
   email: string;
   password: string;
   passwordConfirm: string;
@@ -20,7 +19,6 @@ interface RegisterErrorResponse {
 export default function RegisterForm() {
   const [formData, setFormData] = useState<SignUpFormState>({
     firstname: '',
-    lastname: '',
     email: '',
     password: '',
     passwordConfirm: '',
@@ -28,6 +26,9 @@ export default function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [showResetModal, setShowResetModal] = useState(false);
+
+  const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)){1,}[a-zA-Z]{2,6}$/;
+  const PASSWORD_REGEX_3=  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,6 +46,20 @@ export default function RegisterForm() {
       setLoading(false);
       return;
     }
+    
+     if (!EMAIL_REGEX.test(formData.email)) {
+    setError('Adresse email invalide. Utilisez un format comme : nom@domaine.com');
+    setLoading(false);
+    return;
+  }
+
+  // ✅ Évite les emails trop longs ou vides
+  if (formData.email.length < 6 || formData.email.length > 254) {
+    setError('L\'email doit faire entre 6 et 254 caractères.');
+    setLoading(false);
+    return;
+  }
+
 
     try {
       await api.post(
@@ -57,7 +72,13 @@ export default function RegisterForm() {
         {
           headers: {},
         }
+        
       );
+      // Auto-login après inscription réussie
+        await api.post('/api/login', {
+      email: formData.email,
+      password: formData.password,
+    });
       window.location.href = '/feed';
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
@@ -103,6 +124,11 @@ export default function RegisterForm() {
             value={formData.email}
             onChange={handleChange}
             required
+            validationError={
+            formData.email && !EMAIL_REGEX.test(formData.email)
+            ? 'Format email invalide (ex: nom@domaine.com)'
+            : null
+            } 
             className="inset-shadow-xl/20 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
           />
           <InputField
@@ -112,7 +138,13 @@ export default function RegisterForm() {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            required
+            validationError={
+              formData.password && !PASSWORD_REGEX_3.test(formData.password)
+              ? 'Format invalide (8 caractères minimum, 1 caractère spécial min, 1 chiffre min)'
+              : null
+            }
+ 
+           required
             className="inset-shadow-xl/20 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
           />
           <InputField
