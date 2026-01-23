@@ -137,7 +137,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
             name="project"
             value={selectedProjectId}
             onChange={e => setSelectedProjectId(Number(e.target.value))}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-black"
+            className="w-full rounded border border-gray-300 px-3 py-2" 
             required
           >
             <option value="" disabled>
@@ -174,7 +174,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
                 name="category"
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="w-full rounded border border-gray-300 px-3 py-2 text-black"
+                className="w-full rounded border border-gray-300 px-3 py-2" 
                 required
               >
                 <option value="" disabled>
@@ -208,7 +208,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
                 name="origin"
                 value={origin}
                 onChange={e => setOrigin(e.target.value)}
-                className="w-full rounded border border-gray-300 px-3 py-2 text-black"
+                className="w-full rounded border border-gray-300 px-3 py-2" 
                 required
               >
                 {ORIGIN_OPTIONS.map(opt => (

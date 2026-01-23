@@ -149,7 +149,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
         <select
           value={selectedProjectId}
           onChange={onProjectChange}
-          className="rounded p-2 text-black"
+          className="rounded p-2"
         >
           {projects.map((project) => (
             <option key={project.id} value={project.id}>

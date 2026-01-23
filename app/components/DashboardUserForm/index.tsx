@@ -154,22 +154,23 @@ export default function UserDashboardComponent() {
 
   const user = profile?.user;
 
-  return (
-    <div className="fkb-bg-diagonal min-h-screen flex flex-col">
-      <section className="py-10 my-auto dark:bg-gray-900 mt-16 md:mt-24">
-        <div className="lg:w-[80%] md:w-[90%] w-[96%] mx-auto flex gap-4 mt-6">
-          <div className="lg:w-[88%] sm:w-[88%] w-full mx-auto shadow-2xl p-4 rounded-xl h-fit self-center dark:bg-gray-800/40">
-            <div>
-              <h1 className="lg:text-3xl md:text-2xl text-xl font-serif font-extrabold mb-1 text-white">
-                Profil de {user?.profile?.firstName || "utilisateur"}
-              </h1>
-              <p className="text-gray-300 text-sm mb-4">
-                Connecté en tant que : <span className="font-semibold">{user?.profile?.firstName}</span>
-              </p>
+ return (
+  <div className="fkb-bg-diagonal min-h-screen flex flex-col">
+    {/* ✅ Supprime section + shadow → fond direct */}
+    <div className="py-10 my-auto mt-16 md:mt-24">
+      <div className="lg:w-[80%] md:w-[90%] w-[96%] mx-auto flex gap-4 mt-6">
+        {/* ✅ Pas de shadow-2xl + transparence subtile */}
+        <div className="lg:w-[88%] sm:w-[88%] w-full mx-auto p-8 rounded-2xl backdrop-blur-xl bg-white/10 dark:bg-black/20 border border-white/20 h-fit self-center">
+          <div>
+            <h1 className="lg:text-3xl md:text-2xl text-xl font-serif font-extrabold mb-1 text-white drop-shadow-md">
+              Profil de {user?.profile?.firstName || "utilisateur"}
+            </h1>
+            <p className="text-gray-300 text-sm mb-4 drop-shadow-sm">
+              Connecté en tant que : <span className="font-semibold">{user?.profile?.firstName}</span>
+            </p>
 
-             <form onSubmit={handleSubmit}>
-  {/* Avatar - CLIC DIRECT sur image */}
-            <div className="w-full rounded-sm relative h-52 overflow-hidden">
+            <form onSubmit={handleSubmit}>
+           <div className="w-full rounded-sm relative h-52 overflow-hidden">
               <div className="absolute inset-0 flex justify-center items-center">
                 <div key={imageKey} className="relative w-[141px] h-[141px] rounded-full overflow-hidden bg-blue-300/20 cursor-pointer hover:ring-4 hover:ring-blue-500/50 transition-all">
                   <Image 
@@ -197,53 +198,61 @@ export default function UserDashboardComponent() {
               </div>
             </div>
 
-
-                <div className="flex flex-col lg:flex-row gap-2 justify-center w-full">
-                  <div className="w-full mb-4 mt-6">
-                    <label htmlFor="firstName" className="mb-2 block text-white">First Name</label>
-                    <input
-                      id="firstName"
-                      type="text"
-                      className="mt-2 p-4 w-full border-2 rounded-lg dark:text-gray-200 dark:border-gray-600 dark:bg-gray-800"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                  </div>
-                  <div className="w-full mb-4 lg:mt-6">
-                    <label htmlFor="email" className="mb-2 block text-white">Email</label>
-                    <input
-                      id="email"
-                      type="email"
-                      className="mt-2 p-4 w-full border-2 rounded-lg dark:text-gray-200 dark:border-gray-600 dark:bg-gray-800"
-                      value={email}
-                      disabled
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="w-full mb-4 lg:mt-6">
-                    <label htmlFor="birthdate" className="mb-2 block text-white">Date de naissance</label>
-                    <input
-                      id="birthdate"
-                      type="date"
-                      className="mt-2 p-4 w-full border-2 rounded-lg dark:text-gray-200 dark:border-gray-600 dark:bg-gray-800"
-                      value={birthDate}
-                      onChange={(e) => setBirthDate(e.target.value)}
-                    />
-                  </div>
+              {/* ✅ Inputs intégrés sans bordure épaisse */}
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="w-full">
+                  <label htmlFor="firstName" className="mb-2 block text-white text-sm font-medium">
+                    First Name
+                  </label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    className="w-full p-4 border border-white/30 rounded-xl bg-white/5 dark:bg-gray-900/30 backdrop-blur-sm text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/50 focus:outline-none transition-all"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full p-4 mt-4 rounded-lg bg-blue-500 text-white text-lg font-semibold hover:bg-blue-600"
-                  disabled={loading}
-                >
-                  {loading ? "Sauvegarde..." : "Sauvegarder"}
-                </button>
-              </form>
-            </div>
+                <div className="w-full">
+                  <label htmlFor="email" className="mb-2 block text-white text-sm font-medium">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    className="w-full p-4 border border-white/30 rounded-xl bg-white/5 dark:bg-gray-900/30 backdrop-blur-sm text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/50 focus:outline-none transition-all opacity-70 cursor-not-allowed"
+                    value={email}
+                    disabled
+                  />
+                </div>
+
+                <div className="w-full">
+                  <label htmlFor="birthdate" className="mb-2 block text-white text-sm font-medium">
+                    Date de naissance
+                  </label>
+                  <input
+                    id="birthdate"
+                    type="date"
+                    className="w-full p-4 border border-white/30 rounded-xl bg-white/5 dark:bg-gray-900/30 backdrop-blur-sm text-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/50 focus:outline-none transition-all"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full p-4 mt-8 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-lg font-semibold hover:from-indigo-600 hover:to-purple-700 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm border border-white/20"
+                disabled={loading}
+              >
+                {loading ? "Sauvegarde..." : "Sauvegarder"}
+              </button>
+            </form>
           </div>
         </div>
-      </section>
+      </div>
     </div>
-  );
+  </div>
+);
 }
+ 
