@@ -3,7 +3,7 @@ import { Component } from './component';
 export type CardVariant = 'cardcolor' | 'purpleCard';
 
 export type CardData = {
-  id?: number; // Id optionnel si certains composants ne l'utilisent pas
+  id?: string; // Id optionnel si certains composants ne l'utilisent pas
   name: string;
   description: string;
   category?: string;
@@ -19,7 +19,7 @@ export type CardData = {
   date?: string | Date;
   className?: string;
   color?: string;
-  //  projectId?: number; // si nécessaire
+  //  projectId?: string; // si nécessaire
   //  title?: string;     // si nécessaire
   //  text?: string;      // si nécessaire
 };

@@ -30,11 +30,11 @@ const CATEGORY_OPTIONS = [
 ];
 
 type AddComponentFormProps = {
-  projectId?: number;
+  projectId?: string;
 };
 
 type ComponentPreview = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   origin: string;
@@ -51,7 +51,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
   // Etat pour plusieurs fichiers
   // const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<number | ''>(projectId ?? '');
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(projectId ?? '');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -109,7 +109,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setPreview(res.data);
-      setContextProjectId(Number(selectedProjectId));
+      setContextProjectId(selectedProjectId);
       router.push('/timeline');
     } catch (err) {
       setPreview({
@@ -136,7 +136,7 @@ const AddComponentForm = ({ projectId }: AddComponentFormProps) => {
             id="project"
             name="project"
             value={selectedProjectId}
-            onChange={e => setSelectedProjectId(Number(e.target.value))}
+            onChange={e => setSelectedProjectId(e.target.value)}
             className="w-full rounded border border-gray-300 px-3 py-2 text-black"
             required
           >

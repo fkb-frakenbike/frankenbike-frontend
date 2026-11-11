@@ -15,12 +15,18 @@ type Props = {
   id: string;
 };
 
+// Same shape as the API route requirement (Requirement::UUID_V7).
+const UUID_V7 = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export default function ComponentDetailsWrapper({ id }: Props) {
   const [component, setComponent] = useState<DetailsProps | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const isValidId = UUID_V7.test(id);
+
   useEffect(() => {
+    if (!isValidId) return;
     const fetchComponent = async () => {
       try {
         const res = await api.get(`/api/components/${id}`);
@@ -37,9 +43,9 @@ export default function ComponentDetailsWrapper({ id }: Props) {
       }
     };
     fetchComponent();
-  }, [id]);
+  }, [id, isValidId]);
 
-  if (!id || !/^\d+$/.test(id)) {
+  if (!isValidId) {
     return <p className="text-red-500">ID de composant invalide</p>;
   }
 
