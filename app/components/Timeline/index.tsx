@@ -14,25 +14,25 @@ import TextLoader from '../TextLoader/TextLoader';
 import Image from 'next/image';
 
 type ProjectData = {
-  id: number;
+  id: string;
   title: string;
   components: Component[];
-  user: { id: number; email: string; profile: { firstName: string; photoUrl: string | null } };
+  user: { id: string; email: string; profile: { firstName: string; photoUrl: string | null } };
 };
 
 interface ProjectApiResponse {
-  id: number;
+  id: string;
   title: string;
-  user: { id: number };
+  user: { id: string };
 }
 
 interface ComponentsFetchErrorResponse {
   error: string;
 }
 
-export default function TimelinePage({ projectId }: { projectId?: number }) {
+export default function TimelinePage({ projectId }: { projectId?: string }) {
   const [projects, setProjects] = useState<ProjectData[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<number | ''>(projectId ?? '');
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(projectId ?? '');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { setSelectedProjectId: setContextProjectId } = useProject();
@@ -43,9 +43,9 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
       setLoading(true);
       try {
         let userProjects: ProjectData[] = [];
-        let initialProjectId: number | '' = '';
+        let initialProjectId = '';
 
-        if (typeof projectId === 'number') {
+        if (projectId) {
           const projectRes = await api.get<ProjectApiResponse>(`/api/projects/${projectId}`);
           const userId = projectRes.data.user.id;
           const userProjectsRes = await api.get<{ data: ProjectData[] }>(`/api/users/${userId}/projects`);
@@ -82,7 +82,7 @@ export default function TimelinePage({ projectId }: { projectId?: number }) {
   }, [projectId, setContextProjectId]);
 
   function onProjectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const id = Number(event.target.value);
+    const id = event.target.value;
     setSelectedProjectId(id);
     setContextProjectId(id);
   }

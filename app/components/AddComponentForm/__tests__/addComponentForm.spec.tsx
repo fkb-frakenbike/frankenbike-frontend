@@ -43,6 +43,8 @@ const fillAndSubmit = async (container: HTMLElement) => {
     target: { files: [file] },
   });
   fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+  // let the submit finish (loading back to false) so no state update lands after the test
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Envoyer' })).toBeEnabled());
 };
 
 describe('AddComponentForm with UUID v7 ids', () => {
@@ -50,7 +52,7 @@ describe('AddComponentForm with UUID v7 ids', () => {
     const { container } = render(<AddComponentForm />);
     await fillAndSubmit(container);
 
-    await waitFor(() => expect(post).toHaveBeenCalledTimes(1));
+    expect(post).toHaveBeenCalledTimes(1);
     expect(post.mock.calls[0][0]).toBe(`/api/projects/${P2}/components`);
   });
 
@@ -58,7 +60,7 @@ describe('AddComponentForm with UUID v7 ids', () => {
     const { container } = render(<AddComponentForm />);
     await fillAndSubmit(container);
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith('/timeline'));
+    expect(push).toHaveBeenCalledWith('/timeline');
     expect(setContextProjectId).toHaveBeenLastCalledWith(P2);
   });
 });
