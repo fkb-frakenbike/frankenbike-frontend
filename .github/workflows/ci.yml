@@ -15,7 +15,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npx tsc --noEmit
       - run: npm run lint
       - run: npm test
       - run: npm run build
+      # After the build: it generates .next/types (global PageProps) that tsc needs.
+      - run: npx tsc --noEmit
