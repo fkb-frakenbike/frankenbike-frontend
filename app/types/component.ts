@@ -21,7 +21,7 @@ export enum ComponentOrigin {
 }
 
 export type Component = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   origin: ComponentOrigin;
